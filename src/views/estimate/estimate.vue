@@ -6,15 +6,99 @@
         <li v-for="item in testClass" :key="item.id">{{ item.type }}</li>
       </ul>
     </div>
-    <div class="content"></div>
+    <div class="content">
+      <p class="content-title">
+        2021中医执业医师资格考试医学综合考试第一次模拟试卷
+      </p>
+      <div class="rules">
+        <p>考试规则</p>
+        <ul>
+          <li class="rule-item">
+            1、考生进入模拟考场，不得携带任何书籍、计算器、通讯工具、资料等。
+          </li>
+          <li class="rule-item">
+            1、考生进入模拟考场，不得携带任何书籍、计算器、通讯工具、资料等。
+          </li>
+          <li class="rule-item">
+            1、考生进入模拟考场，不得携带任何书籍、计算器、通讯工具、资料等。
+          </li>
+        </ul>
+      </div>
+      <div class="time">
+        <p>考试时间</p>
+        <div class="limit-time">2020年12月27日—2021年03月01日</div>
+        <div class="tips">
+          请在规定时间内随时参加考试，自行预留答题时间，超过开放时间则自动交卷。
+        </div>
+      </div>
+      <div class="test-info">
+        <p>报名信息</p>
+        <div class="select">
+          <a-select
+            v-model:value="testInfo.area"
+            style="width: 120px"
+            @change="handleProvinceChange"
+          >
+            <a-select-option v-for="pro in provinceData" :key="pro">
+              {{ pro }}
+            </a-select-option>
+          </a-select>
+          <a-select v-model:value="testInfo.school" style="width: 120px">
+            <a-select-option v-for="city in cities" :key="city">
+              {{ city }}
+            </a-select-option>
+          </a-select>
+          <a-select v-model:value="testInfo.class" style="width: 120px">
+            <a-select-option v-for="pro in provinceData" :key="pro">
+              {{ pro }}
+            </a-select-option>
+          </a-select>
+          <a-select v-model:value="testInfo.subject" style="width: 120px">
+            <a-select-option v-for="city in cities" :key="city">
+              {{ city }}
+            </a-select-option>
+          </a-select>
+        </div>
+      </div>
+      <div class="btn-test">开始考试</div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { reactive } from "vue";
+
 export default {
   setup() {
+    const provinceData = ["Zhejiang", "Jiangsu"];
+    const cityData = reactive({
+      Zhejiang: ["Hangzhou", "Ningbo", "Wenzhou"],
+      Jiangsu: ["Nanjing", "Suzhou", "Zhenjiang"]
+    });
+    const testInfo = reactive({
+      area: "",
+      school: "",
+      class: "",
+      subject: ""
+    });
+    const cities = reactive([]);
     const obj = [
+      {
+        type: "考研",
+        id: "1"
+      },
+      {
+        type: "中医执医医师",
+        id: "2"
+      },
+      {
+        type: "中医助理医师",
+        id: "3"
+      },
+      {
+        type: "中西医助理医师",
+        id: "4"
+      },
       {
         type: "考研",
         id: "1"
@@ -33,39 +117,23 @@ export default {
       }
     ];
     const testClass = reactive(obj);
-    console.log(testClass);
+
+    const handleProvinceChange = (e: string) => {
+      // cities = this.cityData[e];.
+      // let a = 'Zhejiang'
+      // console.log(cityData[a]);
+    };
     return {
-      testClass
+      testClass,
+      provinceData,
+      cities,
+      testInfo,
+      handleProvinceChange
     };
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.estimate {
-  height: 1rem;
-  background-color: #f70;
-  font-size: 0.16rem;
-  margin-bottom: 10px;
-  .title {
-    float: left;
-    height: 100%;
-    line-height: 0.5rem;
-    font-size: 0.16rem;
-  }
-  ul {
-    float: left;
-    height: 100%;
-    li {
-      line-height: 0.5rem;
-      float: left;
-      font-size: 0.16rem;
-    }
-  }
-}
-.content {
-  height: 6rem;
-  width: 100%;
-  background-color: #000;
-}
+@import "./estimate.scss";
 </style>
