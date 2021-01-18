@@ -67,13 +67,20 @@
 
 <script lang="ts">
 import { reactive } from "vue";
+interface City {
+  [key: string]: string[];
+}
+interface Sbujiect {
+  type: string;
+  id: string;
+}
 
 export default {
   setup() {
     const provinceData = ["Zhejiang", "Jiangsu"];
-    const cityData = reactive({
-      Zhejiang: ["Hangzhou", "Ningbo", "Wenzhou"],
-      Jiangsu: ["Nanjing", "Suzhou", "Zhenjiang"]
+    const cityData: City = reactive({
+      'Zhejiang': ["Hangzhou", "Ningbo", "Wenzhou"],
+      'Jiangsu': ["Nanjing", "Suzhou", "Zhenjiang"]
     });
     const testInfo = reactive({
       area: "",
@@ -81,8 +88,8 @@ export default {
       class: "",
       subject: ""
     });
-    const cities = reactive([]);
-    const obj = [
+    const cities: string[] = reactive([]);
+    const obj: Sbujiect[] = [
       {
         type: "考研",
         id: "1"
@@ -119,16 +126,15 @@ export default {
     const testClass = reactive(obj);
 
     const handleProvinceChange = (e: string) => {
-      // cities = this.cityData[e];.
-      // let a = 'Zhejiang'
-      // console.log(cityData[a]);
+      cities.push(...cityData[e]);
+      console.log(cities);
     };
     return {
       testClass,
       provinceData,
-      cities,
       testInfo,
-      handleProvinceChange
+      handleProvinceChange,
+      cities
     };
   }
 };
