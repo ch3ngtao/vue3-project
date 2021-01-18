@@ -8,8 +8,8 @@
 </template>
 
 <script lang="ts">
-import components from "vue-class-component";
-import header from "@/components/head/head.vue";
+// import components from "vue-class-component";
+// import header from "@/components/head/head.vue";
 export default {
   components: {
     // "head-nav": header

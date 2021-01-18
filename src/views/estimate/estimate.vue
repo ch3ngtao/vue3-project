@@ -35,7 +35,7 @@
         <p>报名信息</p>
         <div class="select">
           <a-select
-            v-model:value="testInfo.area"
+            v-model:value="area"
             style="width: 120px"
             @change="handleProvinceChange"
           >
@@ -43,17 +43,17 @@
               {{ pro }}
             </a-select-option>
           </a-select>
-          <a-select v-model:value="testInfo.school" style="width: 120px">
+          <a-select v-model:value="school" style="width: 120px">
             <a-select-option v-for="city in cities" :key="city">
               {{ city }}
             </a-select-option>
           </a-select>
-          <a-select v-model:value="testInfo.class" style="width: 120px">
+          <a-select v-model:value="classes" style="width: 120px">
             <a-select-option v-for="pro in provinceData" :key="pro">
               {{ pro }}
             </a-select-option>
           </a-select>
-          <a-select v-model:value="testInfo.subject" style="width: 120px">
+          <a-select v-model:value="subject" style="width: 120px">
             <a-select-option v-for="city in cities" :key="city">
               {{ city }}
             </a-select-option>
@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { reactive } from "vue";
+import { reactive, toRefs } from "vue";
 interface City {
   [key: string]: string[];
 }
@@ -79,13 +79,13 @@ export default {
   setup() {
     const provinceData = ["Zhejiang", "Jiangsu"];
     const cityData: City = reactive({
-      'Zhejiang': ["Hangzhou", "Ningbo", "Wenzhou"],
-      'Jiangsu': ["Nanjing", "Suzhou", "Zhenjiang"]
+      Zhejiang: ["Hangzhou", "Ningbo", "Wenzhou"],
+      Jiangsu: ["Nanjing", "Suzhou", "Zhenjiang"]
     });
     const testInfo = reactive({
       area: "",
       school: "",
-      class: "",
+      classes: "",
       subject: ""
     });
     const cities: string[] = reactive([]);
@@ -132,7 +132,7 @@ export default {
     return {
       testClass,
       provinceData,
-      testInfo,
+      ...toRefs(testInfo),
       handleProvinceChange,
       cities
     };
