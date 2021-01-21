@@ -5,14 +5,15 @@
   <div class="content">
     <router-view />
   </div>
+  <foot />
 </template>
 
 <script lang="ts">
 // import components from "vue-class-component";
-// import header from "@/components/head/head.vue";
+import foot from "@/components/foot/foot.vue";
 export default {
   components: {
-    // "head-nav": header
+    foot
   },
   setup() {
     //设置根元素字体大小
@@ -52,7 +53,7 @@ export default {
   }
   .content {
     margin: 0 auto;
-    width: calc(100vw - 40%);
+    width: 1160px;
   }
 }
 </style>

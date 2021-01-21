@@ -1,5 +1,6 @@
 <template>
   <div>
+    <bread />
     <div class="estimate">
       <p class="title">考试分类</p>
       <ul>
@@ -60,13 +61,16 @@
           </a-select>
         </div>
       </div>
-      <div class="btn-test">开始考试</div>
+      <div class="btn-test" @click="toTestPage">开始考试</div>
     </div>
+    <foot />
   </div>
 </template>
 
 <script lang="ts">
+import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs } from "vue";
+import { useRouter } from "vue-router";
 interface City {
   [key: string]: string[];
 }
@@ -76,6 +80,9 @@ interface Sbujiect {
 }
 
 export default {
+  components: {
+    bread
+  },
   setup() {
     const provinceData = ["Zhejiang", "Jiangsu"];
     const cityData: City = reactive({
@@ -124,17 +131,28 @@ export default {
       }
     ];
     const testClass = reactive(obj);
+    const router = useRouter();
 
     const handleProvinceChange = (e: string) => {
       cities.push(...cityData[e]);
       console.log(cities);
+    };
+
+    const toTestPage = () => {
+      console.log(router);
+
+      router.push({
+        path: "/userTest"
+      });
     };
     return {
       testClass,
       provinceData,
       ...toRefs(testInfo),
       handleProvinceChange,
-      cities
+      cities,
+      toTestPage,
+      router
     };
   }
 };

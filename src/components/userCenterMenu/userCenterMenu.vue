@@ -58,9 +58,11 @@ export default {
 
 <style lang="scss" scoped>
 .slide-menu {
-  position: absolute;
-  left: -203px;
-  z-index: 99;
+  @media screen and (max-width: 550px) {
+    position: absolute;
+    left: -203px;
+    z-index: 99;
+  }
   width: 202px;
   height: 700px;
   float: left;
@@ -76,6 +78,9 @@ export default {
     border: 1px solid #ddd;
     top: 38%;
     right: -26px;
+    @media screen and (min-width: 550px) {
+      display: none;
+    }
   }
   .head {
     height: 169px;

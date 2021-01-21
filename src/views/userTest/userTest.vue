@@ -1,5 +1,6 @@
 <template>
   <div>
+    <bread />
     <div class="left">
       <div class="tips">
         <div v-for="item in arr" :key="item.id" class="tips-item">
@@ -65,10 +66,14 @@
 </template>
 
 <script lang="ts">
+import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs, ref } from "vue";
 import { TipsType, EpGroup } from "./userTest";
 
 export default {
+  components: {
+    bread
+  },
   setup() {
     //左侧顶部测试题状态
     const tips: TipsType = reactive({
