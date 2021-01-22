@@ -1,12 +1,15 @@
 <template>
   <div>
-    <div class="user-center">
-      <div>
-        <slideMenu />
-      </div>
-      <div class="right">
-        <p class="title">修改密码</p>
-        <resetKey />
+    <div class="fill-content">
+      <bread />
+      <div class="user-center">
+        <div>
+          <slideMenu />
+        </div>
+        <div class="right">
+          <p class="title">修改密码</p>
+          <resetKey />
+        </div>
       </div>
     </div>
   </div>
@@ -27,7 +30,6 @@ export default {
 
 <style lang="scss" scoped>
 .user-center {
-  margin-top: 30px;
 }
 .right {
   float: left;

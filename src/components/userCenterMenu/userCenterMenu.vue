@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="slide-menu" id="slide-menu">
-      <div class="head">
+      <div class="center-head">
         <div class="avatar"></div>
         <p>用户的昵称</p>
       </div>
@@ -82,7 +82,7 @@ export default {
       display: none;
     }
   }
-  .head {
+  .center-head {
     height: 169px;
     overflow: hidden;
     .avatar {

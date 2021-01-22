@@ -3,7 +3,7 @@
     <div class="head">
       <div class="logo"></div>
       <div class="title">中国新青年</div>
-      <div class="login" v-if="true">
+      <div class="login" v-if="false">
         <a-button type="primary" @click="loginModal = true">
           登录
         </a-button>
@@ -11,7 +11,7 @@
           注册
         </a-button>
       </div>
-      <div class="user-center" v-else>个人中心</div>
+      <div class="user-center" v-else @click="toUserCenter">个人中心</div>
     </div>
 
     <a-modal
@@ -86,6 +86,7 @@
 
 <script lang="ts">
 import { reactive, ref, toRefs } from "vue";
+import { useRouter } from "vue-router";
 interface UserInfoType {
   key: number | string;
   password: number | string;
@@ -100,6 +101,7 @@ export default {
       password: "",
       checkpassword: ""
     });
+    const router = useRouter();
 
     const loginIn = (e: object) => {
       console.log(e);
@@ -108,12 +110,19 @@ export default {
     const register = (e: object) => {
       console.log(e);
     };
+
+    const toUserCenter = () => {
+      router.push({
+        path: "/userCenter"
+      });
+    };
     return {
       loginModal,
       registerModal,
       ...toRefs(userInfo),
       loginIn,
-      register
+      register,
+      toUserCenter
     };
   }
 };
