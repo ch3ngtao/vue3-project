@@ -1,0 +1,39 @@
+/* reset */
+html,
+body,
+p {
+  margin: 0;
+  padding: 0;
+}
+html {
+  /* font-size: 13.333335vw; */
+  /* font-size: 312.5%; */
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  font-size: 16px;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+ul,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+}
+
+div,
+section,
+input,
+p {
+  box-sizing: border-box;
+}
+
+input,
+input:focus {
+  border: none;
+  outline: none;
+  padding: 0.05rem 0.1rem;
+  border-bottom: 1px solid #adadad;
+}
