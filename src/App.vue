@@ -2,18 +2,18 @@
   <div id="nav">
     <!-- <head-nav /> -->
   </div>
-  <div class="content">
+  <div>
     <router-view />
   </div>
-  <foot />
+  <!-- <foot /> -->
 </template>
 
 <script lang="ts">
 // import components from "vue-class-component";
-import foot from "@/components/foot/foot.vue";
+// import foot from "@/components/foot/foot.vue";
 export default {
   components: {
-    foot
+    // foot
   },
   setup() {
     //设置根元素字体大小
@@ -31,29 +31,25 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "./style/reset.css";
 @import "./style/base.scss";
-@media screen and (max-width: 500px) {
-  html {
-    font-size: 100px !important;
+@media screen and (max-width: 550px) {
+  html,
+  body {
+    font-size: 14px !important;
   }
   .nav {
     background-color: #eb1a19;
-  }
-  .content {
   }
 }
-@media screen and (min-width: 500px) {
-  html {
-    font-size: 100px !important;
+@media screen and (min-width: 550px) {
+  html,
+  body {
+    font-size: 16px !important;
   }
   .nav {
     background-color: #eb1a19;
-  }
-  .content {
-    margin: 0 auto;
-    width: 1160px;
   }
 }
 </style>

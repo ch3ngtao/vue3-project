@@ -1,65 +1,67 @@
 <template>
   <div>
-    <bread />
-    <div class="left">
-      <div class="tips">
-        <div v-for="item in arr" :key="item.id" class="tips-item">
-          <div :style="{ backgroundColor: item.color }"></div>
-          <p>{{ item.desc }}</p>
+    <div class="fill-content">
+      <bread />
+      <div class="left">
+        <div class="tips">
+          <div v-for="item in arr" :key="item.id" class="tips-item">
+            <div :style="{ backgroundColor: item.color }"></div>
+            <p>{{ item.desc }}</p>
+          </div>
         </div>
-      </div>
-      <div class="test-list">
-        <div v-for="item in testList.ep_groups" :key="item.id">
-          <p>{{ item.group_name }}</p>
-          <div class="list">
-            <div
-              v-for="val in item.group_questions"
-              :key="val.id"
-              class="items"
-              :class="{
-                isSelect: val.no == activeSelect,
-                answered: val.answered
-              }"
-              @click="selectQuestion(val.no)"
-            >
-              {{ val.no }}
+        <div class="test-list">
+          <div v-for="item in testList.ep_groups" :key="item.id">
+            <p>{{ item.group_name }}</p>
+            <div class="list">
+              <div
+                v-for="val in item.group_questions"
+                :key="val.id"
+                class="items"
+                :class="{
+                  isSelect: val.no == activeSelect,
+                  answered: val.answered
+                }"
+                @click="selectQuestion(val.no)"
+              >
+                {{ val.no }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="right">
-      <div class="question-title">
-        <span>02</span>
-        <span>下列疾病，表现为弛张热的是</span>
-      </div>
-      <div class="question-content">
-        <a-radio-group v-model:value="radioValue" @change="onChange">
-          <a-radio :style="radioStyle" :value="1">
-            Option A
-          </a-radio>
-          <a-radio :style="radioStyle" :value="2">
-            Option B
-          </a-radio>
-          <a-radio :style="radioStyle" :value="3">
-            Option C
-          </a-radio>
-        </a-radio-group>
+      <div class="right">
+        <div class="question-title">
+          <span>02</span>
+          <span>下列疾病，表现为弛张热的是</span>
+        </div>
+        <div class="question-content">
+          <a-radio-group v-model:value="radioValue" @change="onChange">
+            <a-radio :style="radioStyle" :value="1">
+              Option A
+            </a-radio>
+            <a-radio :style="radioStyle" :value="2">
+              Option B
+            </a-radio>
+            <a-radio :style="radioStyle" :value="3">
+              Option C
+            </a-radio>
+          </a-radio-group>
 
-        <a-checkbox-group
-          v-model:value="checkList"
-          style="display: block"
-          :options="plainOptions"
-          @change="onCheck"
-        />
-      </div>
-      <div class="btns">
-        <a-button type="danger">
-          上一题
-        </a-button>
-        <a-button type="primary">
-          下一题
-        </a-button>
+          <a-checkbox-group
+            v-model:value="checkList"
+            style="display: block"
+            :options="plainOptions"
+            @change="onCheck"
+          />
+        </div>
+        <div class="btns">
+          <a-button type="danger">
+            上一题
+          </a-button>
+          <a-button type="primary">
+            下一题
+          </a-button>
+        </div>
       </div>
     </div>
   </div>

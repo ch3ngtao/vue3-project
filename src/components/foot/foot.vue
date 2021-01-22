@@ -14,8 +14,10 @@ export default {};
 
 <style lang="scss" scoped>
 .footer {
-  position: fixed;
-  bottom: 0;
+  @media screen and (max-width: 550px) {
+    display: none;
+  }
+  margin-top: 30px;
   width: 100vw;
   .bottom {
     background: #000;

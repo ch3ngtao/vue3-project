@@ -1,6 +1,6 @@
 .estimate {
   height: 50px;
-  background-color: #f70;
+  background-color: #cc4935;
   font-size: 16px;
   margin-bottom: 10px;
   .title {
@@ -10,11 +10,16 @@
     text-align: center;
     line-height: 50px;
     font-size: 16px;
+    background: #ddd;
+    @media screen and (max-width: 550px) {
+      display: none;
+    }
   }
   ul {
     float: left;
     height: 100%;
     @media screen and (max-width: 550px) {
+      margin-top: 6px;
       width: fit-content;
       overflow: scroll;
       margin-left: 8px;
@@ -24,12 +29,14 @@
     }
     li {
       line-height: 50px;
+      color: #fff;
       margin: 0 16px;
       float: left;
       font-size: 16px;
+      cursor: pointer;
       @media screen and (max-width: 550px) {
-        font-size: 10px;
-        line-height: 22px;
+        font-size: 12px;
+        line-height: 20px;
         margin: 0 4px;
       }
     }
@@ -41,6 +48,9 @@
   background-color: #fff;
   border: 1px solid #ccc;
   padding: 30px;
+  @media screen and (max-width: 550px) {
+    border: none;
+  }
   .content-title {
     font-weight: bold;
     text-align: center;
@@ -85,7 +95,7 @@
     height: 30px;
     line-height: 30px;
     &::before {
-      content: '';
+      content: "";
       float: left;
       height: 14px;
       margin-top: 8px;
@@ -96,6 +106,10 @@
   }
 }
 
+/deep/.ant-select {
+  margin: 2px 4px;
+}
+
 .btn-test {
   margin-top: 50px;
   height: 50px;
@@ -103,7 +117,7 @@
   line-height: 50px;
   text-align: center;
   color: #fff;
-  background-color: #CC4935;
+  background-color: #cc4935;
   border-radius: 6px;
   @media screen and (max-width: 550px) {
     margin: 50px auto 0;

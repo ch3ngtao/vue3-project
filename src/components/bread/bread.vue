@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin: 0 auto 10px">
     <a-breadcrumb :routes="routes">
       <template #itemRender="{ route, paths, routes }">
         <span v-if="routes.indexOf(route) === routes.length - 1">
