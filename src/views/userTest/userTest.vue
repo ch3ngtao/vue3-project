@@ -59,7 +59,7 @@
           <a-button type="danger">
             上一题
           </a-button>
-          <a-button type="primary">
+          <a-button type="primary" @click="nextTest">
             下一题
           </a-button>
         </div>
@@ -188,6 +188,22 @@ export default {
       activeSelect.value = idx;
     };
 
+    const nextTest = () => {
+      testList.ep_groups.forEach(items => {
+        items.group_questions.forEach(item => {
+          if (item.no == activeSelect.value) {
+            item.answered = 1;
+          }
+        });
+      });
+      const index = Number(activeSelect.value) + 1;
+      if (index < 10) {
+        activeSelect.value = `0${index}`;
+      } else {
+        activeSelect.value = `${index}`;
+      }
+    };
+
     const onChange = (e: any) => {
       console.log("radio checked", e.target.value);
     };
@@ -206,7 +222,8 @@ export default {
       radioValue,
       plainOptions,
       ...toRefs(checkInfo),
-      onCheck
+      onCheck,
+      nextTest
     };
   }
 };
