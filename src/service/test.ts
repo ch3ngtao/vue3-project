@@ -1,6 +1,12 @@
 import config from "@/config/config";
 import axios from 'axios';
 
+interface CurrentQuestionType {
+  ecId: any,
+  no: string,
+  unit_code?: string
+}
+
 //试卷分类列表
 export function getTestClass (id: number) {
   return axios({
@@ -20,5 +26,28 @@ export function getSelectClass (id: number) {
     params: {
       ec_id: id
     }
+  })
+}
+//左侧题目栏
+export function getLeftMenuList (id: any) {
+  return axios({
+    method: "get",
+    url: config.baseUrl + "4174302",
+    params: {
+      ec_id: id
+    }
+  })
+}
+
+export function getCurrentQuestion (data: CurrentQuestionType) {
+  return axios({
+    method: "get",
+    url: config.baseUrl + "4192015",
+    params: {
+      ec_id: data.ecId,
+      question_id: data.no,
+      unit_code: data.unit_code
+    },
+    headers: { "Client-Token": "" }
   })
 }

@@ -74,6 +74,7 @@ import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs, ref, getCurrentInstance } from "vue";
 import { TipsType, EpGroup } from "./userTest";
 import { useRoute } from "vue-router";
+import { getLeftMenuList, getCurrentQuestion } from "@/service/test";
 
 export default {
   components: {
@@ -122,50 +123,36 @@ export default {
     ];
 
     const fetchLeftMenu = () => {
-      ctx
-        .$axios({
-          method: "get",
-          url: "http://127.0.0.1:4523/mock2/371085/4174302",
-          params: {
-            ec_id: ecId
-          }
-        })
-        .then((res: any) => {
-          console.log(res);
-          const resData = res.data.data;
-          // testList = { 页面不刷新数据
-          //   ep_id: resData.ep_id,
-          //   ep_duration: resData.ep_duration,
-          //   ep_groups: resData.ep_groups
-          // };
-          Object.assign(testList, resData);
-        });
+      getLeftMenuList(ecId).then((res: any) => {
+        console.log(res);
+        const resData = res.data.data;
+        // testList = { 页面不刷新数据
+        //   ep_id: resData.ep_id,
+        //   ep_duration: resData.ep_duration,
+        //   ep_groups: resData.ep_groups
+        // };
+        Object.assign(testList, resData);
+      });
     };
     fetchLeftMenu();
 
     const selectQuestion = (no: string) => {
       activeSelect.value = no;
-      ctx
-        .$axios({
-          method: "get",
-          url: "http://127.0.0.1:4523/mock2/371085/4174302",
-          params: {
-            ec_id: ecId,
-            question_id: no,
-            unit_code: ""
-          },
-          header: { "Client-Token": "" }
-        })
-        .then((res: any) => {
-          console.log(res);
-          const resData = res.data.data;
-          // testList = { 页面不刷新数据
-          //   ep_id: resData.ep_id,
-          //   ep_duration: resData.ep_duration,
-          //   ep_groups: resData.ep_groups
-          // };
-          Object.assign(testList, resData);
-        });
+      const data = {
+        ecId: ecId,
+        no,
+        unit_code: ""
+      };
+      getCurrentQuestion(data).then((res: any) => {
+        console.log(res);
+        const resData = res.data.data;
+        // testList = { 页面不刷新数据
+        //   ep_id: resData.ep_id,
+        //   ep_duration: resData.ep_duration,
+        //   ep_groups: resData.ep_groups
+        // };
+        Object.assign(testList, resData);
+      });
     };
 
     const onChange = (e: any) => {
