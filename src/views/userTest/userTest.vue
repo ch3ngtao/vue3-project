@@ -146,12 +146,14 @@ export default {
       getCurrentQuestion(data).then((res: any) => {
         console.log(res);
         const resData = res.data.data;
+        console.log(resData);
+
         // testList = { 页面不刷新数据
         //   ep_id: resData.ep_id,
         //   ep_duration: resData.ep_duration,
         //   ep_groups: resData.ep_groups
         // };
-        Object.assign(testList, resData);
+        // Object.assign(testList, resData);
       });
     };
 
