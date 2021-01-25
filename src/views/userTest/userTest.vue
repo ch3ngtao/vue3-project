@@ -71,8 +71,9 @@
 
 <script lang="ts">
 import bread from "@/components/bread/bread.vue";
-import { reactive, toRefs, ref } from "vue";
+import { reactive, toRefs, ref, getCurrentInstance } from "vue";
 import { TipsType, EpGroup } from "./userTest";
+import { useRoute } from "vue-router";
 
 export default {
   components: {
@@ -84,6 +85,9 @@ export default {
       arr: []
     });
     const plainOptions = ["Apple", "Pear", "Orange"];
+    const route = useRoute();
+    const ecId = route.query.id;
+    const { ctx }: any = getCurrentInstance();
     const activeSelect = ref("");
     const radioStyle = reactive({
       display: "block",
@@ -95,76 +99,9 @@ export default {
       checkList: []
     });
     //左测试题目列表
-    let testList: EpGroup = reactive({
+    const testList: EpGroup = reactive({
       ep_groups: []
     });
-    const datas = {
-      ep_id: 39,
-      ep_duration: 30,
-      ep_groups: [
-        {
-          group_name: "子证八世",
-          group_questions: [
-            {
-              no: "01",
-              answered: 0,
-              question_id: 45
-            },
-            {
-              no: "02",
-              answered: 3,
-              question_id: 3
-            },
-            {
-              no: "03",
-              answered: 0,
-              question_id: 5
-            },
-            {
-              no: "04",
-              answered: 86,
-              question_id: 45
-            },
-            {
-              no: "05",
-              answered: 3,
-              question_id: 3
-            },
-            {
-              no: "06",
-              answered: 80,
-              question_id: 5
-            }
-          ]
-        },
-        {
-          group_name: "ddd",
-          group_questions: [
-            {
-              no: "07",
-              answered: 86,
-              question_id: 45
-            },
-            {
-              no: "08",
-              answered: 3,
-              question_id: 3
-            },
-            {
-              no: "09",
-              answered: 80,
-              question_id: 5
-            }
-          ]
-        }
-      ]
-    };
-
-    testList = {
-      ep_id: datas.ep_id,
-      ep_duration: datas.ep_duration,
-      ep_groups: datas.ep_groups
-    };
 
     tips.arr = [
       {
@@ -184,8 +121,51 @@ export default {
       }
     ];
 
-    const selectQuestion = (idx: string) => {
-      activeSelect.value = idx;
+    const fetchLeftMenu = () => {
+      ctx
+        .$axios({
+          method: "get",
+          url: "http://127.0.0.1:4523/mock2/371085/4174302",
+          params: {
+            ec_id: ecId
+          }
+        })
+        .then((res: any) => {
+          console.log(res);
+          const resData = res.data.data;
+          // testList = { 页面不刷新数据
+          //   ep_id: resData.ep_id,
+          //   ep_duration: resData.ep_duration,
+          //   ep_groups: resData.ep_groups
+          // };
+          Object.assign(testList, resData);
+        });
+    };
+    fetchLeftMenu();
+
+    const selectQuestion = (no: string) => {
+      activeSelect.value = no;
+      ctx
+        .$axios({
+          method: "get",
+          url: "http://127.0.0.1:4523/mock2/371085/4174302",
+          params: {
+            ec_id: ecId,
+            question_id: no,
+            unit_code: ""
+          },
+          header: { "Client-Token": "" }
+        })
+        .then((res: any) => {
+          console.log(res);
+          const resData = res.data.data;
+          // testList = { 页面不刷新数据
+          //   ep_id: resData.ep_id,
+          //   ep_duration: resData.ep_duration,
+          //   ep_groups: resData.ep_groups
+          // };
+          Object.assign(testList, resData);
+        });
     };
 
     const onChange = (e: any) => {
@@ -195,6 +175,7 @@ export default {
     const onCheck = () => {
       console.log(checkInfo.checkList);
     };
+    console.log(testList, "testList");
 
     return {
       ...toRefs(tips),
@@ -260,6 +241,7 @@ export default {
         border: 1px solid #ddd;
         margin: 2px 8px;
         cursor: pointer;
+        overflow: hidden;
       }
       .answered {
         background: #1890ff;

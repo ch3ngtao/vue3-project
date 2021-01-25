@@ -6,7 +6,13 @@
       <div class="estimate">
         <p class="title">考试分类</p>
         <ul>
-          <li v-for="item in testClass" :key="item.id">{{ item.type }}</li>
+          <li
+            v-for="(item, index) in testClass.subjects"
+            :key="item.ec_id"
+            @click="selectSubject(index, item.ec_id)"
+          >
+            {{ item.ec_name }}
+          </li>
         </ul>
       </div>
       <div class="content">
@@ -20,10 +26,19 @@
               1、考生进入模拟考场，不得携带任何书籍、计算器、通讯工具、资料等。
             </li>
             <li class="rule-item">
-              1、考生进入模拟考场，不得携带任何书籍、计算器、通讯工具、资料等。
+              2、考生在每科考试前5分钟进入模拟考场。
             </li>
             <li class="rule-item">
-              1、考生进入模拟考场，不得携带任何书籍、计算器、通讯工具、资料等。
+              3、考生考试终了，时间一到，考生应立即停止答卷。
+            </li>
+            <li class="rule-item">
+              4、考试方式为上机模拟考试，严禁携带任何与考试无关的资料。
+            </li>
+            <li class="rule-item">
+              5、考试时间为模拟考试时间，请在规定时间内答题，超时则视为自动交卷处理。
+            </li>
+            <li class="rule-item">
+              6、考生必须严格遵守考场纪律，违者视情节轻重，分别给予批评、试卷作废、取消考试资格等处理。
             </li>
           </ul>
         </div>
@@ -62,6 +77,12 @@
               </a-select-option>
             </a-select>
           </div>
+          <p>考试单远</p>
+          <div class="units">
+            <div class="units-item" v-for="item in 4" :key="item">
+              第{{ item }}单元
+            </div>
+          </div>
         </div>
         <div class="btn-test" @click="toTestPage">开始考试</div>
       </div>
@@ -72,14 +93,18 @@
 
 <script lang="ts">
 import bread from "@/components/bread/bread.vue";
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs, ref } from "vue";
 import { useRouter } from "vue-router";
+import { getTestClass, getSelectClass } from "@/service/test";
 interface City {
   [key: string]: string[];
 }
 interface Sbujiect {
-  type: string;
-  id: string;
+  ec_name: string;
+  ec_id: number;
+}
+interface TestClassType {
+  subjects?: Sbujiect[];
 }
 
 export default {
@@ -87,6 +112,8 @@ export default {
     bread
   },
   setup() {
+    const activeIndex = ref();
+    const ecId = ref(); //科目id
     const provinceData = ["Zhejiang", "Jiangsu"];
     const cityData: City = reactive({
       Zhejiang: ["Hangzhou", "Ningbo", "Wenzhou"],
@@ -99,53 +126,37 @@ export default {
       subject: ""
     });
     const cities: string[] = reactive([]);
-    const obj: Sbujiect[] = [
-      {
-        type: "考研",
-        id: "1"
-      },
-      {
-        type: "中医执医医师",
-        id: "2"
-      },
-      {
-        type: "中医助理医师",
-        id: "3"
-      },
-      {
-        type: "中西医助理医师",
-        id: "4"
-      },
-      {
-        type: "考研",
-        id: "1"
-      },
-      {
-        type: "中医执医医师",
-        id: "2"
-      },
-      {
-        type: "中医助理医师",
-        id: "3"
-      },
-      {
-        type: "中西医助理医师",
-        id: "4"
-      }
-    ];
-    const testClass = reactive(obj);
+    const testClass: TestClassType = reactive({});
     const router = useRouter();
 
     const handleProvinceChange = (e: string) => {
       cities.push(...cityData[e]);
       console.log(cities);
     };
-
+    //初始化列表
+    const fetchClass = () => {
+      getTestClass(1).then((res: any) => {
+        testClass.subjects = res.data.data;
+        ecId.value = res.data.data[0].ec_id;
+        console.log(testClass.subjects, "subjects");
+      });
+    };
+    fetchClass();
+    //选择科目
+    const selectSubject = (i: number, ec_id: number) => {
+      activeIndex.value = i;
+      ecId.value = ec_id;
+      getSelectClass(ecId.value).then((res: any) => {
+        console.log(res);
+      });
+      console.log(i);
+    };
     const toTestPage = () => {
-      console.log(router);
-
       router.push({
-        path: "/userTest"
+        path: "/userTest",
+        query: {
+          id: ecId.value
+        }
       });
     };
     return {
@@ -155,7 +166,9 @@ export default {
       handleProvinceChange,
       cities,
       toTestPage,
-      router
+      router,
+      fetchClass,
+      selectSubject
     };
   }
 };
