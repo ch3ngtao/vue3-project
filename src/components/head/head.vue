@@ -3,7 +3,7 @@
     <div class="head">
       <div class="logo"></div>
       <div class="title">中国新青年</div>
-      <div class="login" v-if="true">
+      <div class="login" v-if="!token">
         <a-button type="primary" @click="loginModal = true">
           登录
         </a-button>
@@ -112,6 +112,8 @@ interface UserInfoType {
   checkpassword?: number | string;
   code?: number | string;
 }
+import { useStore } from "vuex";
+import { message } from "ant-design-vue";
 export default {
   setup() {
     const registerModal = ref(false);
@@ -123,6 +125,8 @@ export default {
       code: ""
     });
     const router = useRouter();
+    const store = useStore();
+    console.log(store.state.token, "token");
 
     //验证码
     const sendCode = () => {
@@ -134,6 +138,12 @@ export default {
     const loginIn = () => {
       userLogin(userInfo).then((res: any) => {
         console.log(res);
+        if (res.data && res.data.data.token) {
+          loginModal.value = false;
+          store.commit("setToken", res.data.data.token);
+        } else {
+          message.info("请重新输入正确密码");
+        }
       });
     };
     //注册
@@ -155,7 +165,9 @@ export default {
       loginIn,
       register,
       toUserCenter,
-      sendCode
+      sendCode,
+      ...toRefs(store.state),
+      message
     };
   }
 };
@@ -216,6 +228,7 @@ export default {
     margin-top: 35px;
     margin-right: 50px;
     float: right;
+    cursor: pointer;
     @media screen and (max-width: 550px) {
       margin-right: 8px;
       font-size: 14px;

@@ -15,9 +15,9 @@
           </li>
         </ul>
       </div>
-      <div class="content">
+      <div class="content" v-if="subjectTestsList.length > 0">
         <p class="content-title">
-          2021中医执业医师资格考试医学综合考试第一次模拟试卷
+          {{ subjectTestsList[0].title }}
         </p>
         <div class="rules">
           <p>考试规则</p>
@@ -44,7 +44,9 @@
         </div>
         <div class="time">
           <p>考试时间</p>
-          <div class="limit-time">2020年12月27日—2021年03月01日</div>
+          <div class="limit-time">
+            {{ subjectTestsList[0].start_at }}—{{ subjectTestsList[0].end_at }}
+          </div>
           <div class="tips">
             请在规定时间内随时参加考试，自行预留答题时间，超过开放时间则自动交卷。
           </div>
@@ -111,6 +113,21 @@ interface Sbujiect {
 interface TestClassType {
   subjects?: Sbujiect[];
 }
+interface SubjectTestsListType {
+  duration: number;
+  ec_id: number;
+  end_at: number;
+  ep_id: number;
+  need_sign: number;
+  score: number;
+  start_at: number;
+  title: string;
+  unit: number;
+}
+
+interface SubjectTestsInfoType {
+  subjectTestsList: SubjectTestsListType[];
+}
 
 export default {
   components: {
@@ -119,6 +136,9 @@ export default {
   setup() {
     const activeIndex = ref();
     const ecId = ref(); //科目id
+    const subjectTestsInfo: SubjectTestsInfoType = reactive({
+      subjectTestsList: []
+    });
     const provinceData = ["Zhejiang", "Jiangsu"];
     const cityData: City = reactive({
       Zhejiang: ["Hangzhou", "Ningbo", "Wenzhou"],
@@ -138,24 +158,26 @@ export default {
       cities.push(...cityData[e]);
       console.log(cities);
     };
-    //初始化列表
-    const fetchClass = () => {
-      getTestClass(1).then((res: any) => {
-        testClass.subjects = res.data.data;
-        ecId.value = res.data.data[0].ec_id;
-        console.log(testClass.subjects, "subjects");
-      });
-    };
-    fetchClass();
+
     //选择科目
     const selectSubject = (i: number, ec_id: number) => {
       activeIndex.value = i;
       ecId.value = ec_id;
       getSelectClass(ecId.value).then((res: any) => {
-        console.log(res);
+        subjectTestsInfo.subjectTestsList = res.data.data;
       });
       console.log(i);
     };
+    //初始化列表
+    const fetchClass = () => {
+      getTestClass(1).then((res: any) => {
+        testClass.subjects = res.data.data;
+        ecId.value = res.data.data[0].ec_id;
+        selectSubject(0, ecId.value);
+      });
+    };
+    fetchClass();
+
     const toTestPage = (idx: number) => {
       router.push({
         path: "/userTest",
@@ -174,7 +196,8 @@ export default {
       toTestPage,
       router,
       fetchClass,
-      selectSubject
+      selectSubject,
+      ...toRefs(subjectTestsInfo)
     };
   }
 };

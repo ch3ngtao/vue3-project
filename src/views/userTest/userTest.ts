@@ -21,6 +21,21 @@ export interface EpGroupItem {
 
 export interface EpGroup {
   ep_groups: EpGroupItem[]
-  ep_id?: number,
+  ep_id: number,
   ep_duration?: number
+}
+
+export interface QuestionListType {
+  ep_id: number,
+  uestion_group: number
+  question_id: number
+  question_options: string
+  question_score: number
+  question_style: number
+  question_title: string
+  unit_code: string
+}
+
+export interface QuestionInfoType {
+  questionList: QuestionListType[]
 }

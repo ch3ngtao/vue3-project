@@ -1,5 +1,6 @@
 <template>
   <div>
+    <head-com />
     <div class="fill-content">
       <bread />
       <div class="user-center">

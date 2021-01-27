@@ -7,6 +7,13 @@ interface CurrentQuestionType {
   unit_code?: any
 }
 
+interface SubmitQuestionType {
+  question_id: string|number,
+  answer: string,
+  ep_id: string|number,
+  unit_code?:string
+}
+
 //试卷分类列表
 export function getTestClass (id: number) {
   return axios({
@@ -39,7 +46,7 @@ export function getLeftMenuList (data: CurrentQuestionType) {
     }
   })
 }
-
+//右侧题目
 export function getCurrentQuestion (data: CurrentQuestionType) {
   return axios({
     method: "get",
@@ -48,6 +55,32 @@ export function getCurrentQuestion (data: CurrentQuestionType) {
       ec_id: data.ecId,
       question_id: data.no,
       unit_code: data.unit_code
+    },
+    headers: { "Client-Token": "" }
+  })
+}
+//提交试题
+export function submitQuestion (data: SubmitQuestionType) {
+  return axios({
+    method: "post",
+    url: config.baseUrl + "4146471",
+    data: {
+      question_id: data.question_id,
+      answer: data.answer,
+      ep_id: data.ep_id,
+      unit_code: data.unit_code
+    },
+    headers: { "Client-Token": "" }
+  })
+}
+
+//提交试卷
+export function submitTestCard (id:number|string) {
+  return axios({
+    method: "post",
+    url: config.baseUrl + "4202521",
+    data: {
+      ep_id: id
     },
     headers: { "Client-Token": "" }
   })

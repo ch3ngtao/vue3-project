@@ -29,21 +29,26 @@
             </div>
           </div>
         </div>
+        <div class="btn-submit">
+          <a-button type="primary" @click="submitTest">
+            提交试卷
+          </a-button>
+        </div>
       </div>
       <div class="right">
-        <div class="question-title">
+        <div class="question-title" v-if="questionList.length">
           <span>02</span>
-          <span>下列疾病，表现为弛张热的是</span>
+          <span>{{ questionList[0].question_title }}</span>
         </div>
         <div class="question-content">
           <a-radio-group v-model:value="radioValue" @change="onChange">
-            <a-radio :style="radioStyle" :value="1">
+            <a-radio :style="radioStyle" :value="'A'">
               Option A
             </a-radio>
-            <a-radio :style="radioStyle" :value="2">
+            <a-radio :style="radioStyle" :value="'B'">
               Option B
             </a-radio>
-            <a-radio :style="radioStyle" :value="3">
+            <a-radio :style="radioStyle" :value="'C'">
               Option C
             </a-radio>
           </a-radio-group>
@@ -72,9 +77,14 @@
 <script lang="ts">
 import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs, ref } from "vue";
-import { TipsType, EpGroup } from "./userTest";
+import { TipsType, EpGroup, QuestionInfoType } from "./userTest";
 import { useRoute } from "vue-router";
-import { getLeftMenuList, getCurrentQuestion } from "@/service/test";
+import {
+  getLeftMenuList,
+  getCurrentQuestion,
+  submitQuestion,
+  submitTestCard
+} from "@/service/test";
 
 export default {
   components: {
@@ -90,7 +100,7 @@ export default {
     const ecId = route.query.id;
     const unit_code = route.query.unit_code;
     const activeSelect = ref("");
-    const questionInfo = reactive({
+    const questionInfo: QuestionInfoType = reactive({
       questionList: []
     });
     const radioStyle = reactive({
@@ -98,13 +108,14 @@ export default {
       height: "30px",
       lineHeight: "30px"
     });
-    const radioValue = ref(0);
+    const radioValue = ref("");
     const checkInfo = reactive({
       checkList: []
     });
     //左测试题目列表
     const testList: EpGroup = reactive({
-      ep_groups: []
+      ep_groups: [],
+      ep_id: 0
     });
 
     tips.arr = [
@@ -124,25 +135,7 @@ export default {
         color: "white"
       }
     ];
-
-    const fetchLeftMenu = () => {
-      const data = {
-        ecId: ecId,
-        unit_code: unit_code
-      };
-      getLeftMenuList(data).then((res: any) => {
-        console.log(res);
-        const resData = res.data.data;
-        // testList = { 页面不刷新数据
-        //   ep_id: resData.ep_id,
-        //   ep_duration: resData.ep_duration,
-        //   ep_groups: resData.ep_groups
-        // };
-        Object.assign(testList, resData);
-      });
-    };
-    fetchLeftMenu();
-
+    //每道题的问题
     const selectQuestion = (no: string) => {
       activeSelect.value = no;
       const data = {
@@ -154,24 +147,48 @@ export default {
         console.log(res);
         const resData: [] = res.data.data;
         questionInfo.questionList = resData;
-
-        // testList = { 页面不刷新数据
-        //   ep_id: resData.ep_id,
-        //   ep_duration: resData.ep_duration,
-        //   ep_groups: resData.ep_groups
-        // };
-        // Object.assign(testList, resData);
       });
     };
+    //获取左边问题栏问题
+    const fetchLeftMenu = () => {
+      const data = {
+        ecId: ecId,
+        unit_code: unit_code
+      };
+      getLeftMenuList(data).then((res: any) => {
+        const resData = res.data.data;
+        Object.assign(testList, resData);
+        selectQuestion(testList.ep_groups[0].group_questions[0].no);
+      });
+    };
+    fetchLeftMenu();
 
     const onChange = (e: any) => {
       console.log("radio checked", e.target.value);
+    };
+    //提交试卷
+    const submitTest = () => {
+      submitTestCard(testList.ep_id).then((res: any) => {
+        console.log(res);
+      });
     };
 
     const onCheck = () => {
       console.log(checkInfo.checkList);
     };
-    console.log(testList, "testList");
+
+    const nextTest = () => {
+      console.log(radioValue);
+      const data = {
+        question_id: questionInfo.questionList[0].question_id,
+        answer: radioValue.value,
+        ep_id: questionInfo.questionList[0].ep_id,
+        unit_code: questionInfo.questionList[0].unit_code
+      };
+      submitQuestion(data).then((res: any) => {
+        console.log(res);
+      });
+    };
 
     return {
       ...toRefs(tips),
@@ -184,7 +201,9 @@ export default {
       plainOptions,
       ...toRefs(checkInfo),
       onCheck,
-      ...toRefs(questionInfo)
+      ...toRefs(questionInfo),
+      nextTest,
+      submitTest
     };
   }
 };
@@ -199,6 +218,11 @@ export default {
   border: 1px solid #000;
   @media screen and (max-width: 550px) {
     display: none;
+  }
+  .btn-submit {
+    margin-top: 40px;
+    margin-left: 50%;
+    transform: translateX(-50%);
   }
   .tips {
     display: flex;

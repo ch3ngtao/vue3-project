@@ -16,17 +16,15 @@ export default {
     // foot
   },
   setup() {
-    //设置根元素字体大小
-    // const getScreenWidth = () => {
-    //   document.documentElement.style.fontSize =
-    //     document.documentElement.clientWidth / 10 + "px";
-    //   console.log(document.documentElement.style.fontSize);
-    // };
-    // window.addEventListener("resize", () => {
-    //   document.documentElement.style.fontSize =
-    //     document.documentElement.clientWidth / 10 + "px";
-    //   getScreenWidth();
-    // });
+    if (
+      navigator.userAgent.match(
+        /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
+      )
+    ) {
+      document.write("手机访问.");
+    } else {
+      document.write("电脑访问.");
+    }
   }
 };
 </script>
