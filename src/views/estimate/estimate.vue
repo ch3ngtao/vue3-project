@@ -79,12 +79,17 @@
           </div>
           <p>考试单远</p>
           <div class="units">
-            <div class="units-item" v-for="item in 4" :key="item">
+            <div
+              class="units-item"
+              v-for="item in 4"
+              :key="item"
+              @click="toTestPage(item)"
+            >
               第{{ item }}单元
             </div>
           </div>
         </div>
-        <div class="btn-test" @click="toTestPage">开始考试</div>
+        <div class="btn-test" @click="toTestPage(null)">开始考试</div>
       </div>
     </div>
     <foot-com />
@@ -151,11 +156,12 @@ export default {
       });
       console.log(i);
     };
-    const toTestPage = () => {
+    const toTestPage = (idx: number) => {
       router.push({
         path: "/userTest",
         query: {
-          id: ecId.value
+          id: ecId.value,
+          unit_code: idx ? `unit_${idx + 1}` : ""
         }
       });
     };

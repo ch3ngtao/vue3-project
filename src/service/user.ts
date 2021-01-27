@@ -29,7 +29,7 @@ export function userRegister (userInfo:UserInfoType) {
 //用户登录
 export function userLogin (userInfo:UserInfoType) {
   const { key, password } = userInfo;
-  const secret = Md5.hashStr(password.toString());
+  const secret:string = Md5.hashStr(password.toString()).toString().toUpperCase();
   return axios({
     method: "post",
     url: config.baseUrl + '4174754',

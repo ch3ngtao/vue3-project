@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import bread from "@/components/bread/bread.vue";
-import { reactive, toRefs, ref, getCurrentInstance } from "vue";
+import { reactive, toRefs, ref } from "vue";
 import { TipsType, EpGroup } from "./userTest";
 import { useRoute } from "vue-router";
 import { getLeftMenuList, getCurrentQuestion } from "@/service/test";
@@ -88,8 +88,11 @@ export default {
     const plainOptions = ["Apple", "Pear", "Orange"];
     const route = useRoute();
     const ecId = route.query.id;
-    const { ctx }: any = getCurrentInstance();
+    const unit_code = route.query.unit_code;
     const activeSelect = ref("");
+    const questionInfo = reactive({
+      questionList: []
+    });
     const radioStyle = reactive({
       display: "block",
       height: "30px",
@@ -123,7 +126,11 @@ export default {
     ];
 
     const fetchLeftMenu = () => {
-      getLeftMenuList(ecId).then((res: any) => {
+      const data = {
+        ecId: ecId,
+        unit_code: unit_code
+      };
+      getLeftMenuList(data).then((res: any) => {
         console.log(res);
         const resData = res.data.data;
         // testList = { 页面不刷新数据
@@ -141,12 +148,12 @@ export default {
       const data = {
         ecId: ecId,
         no,
-        unit_code: ""
+        unit_code
       };
       getCurrentQuestion(data).then((res: any) => {
         console.log(res);
-        const resData = res.data.data;
-        console.log(resData);
+        const resData: [] = res.data.data;
+        questionInfo.questionList = resData;
 
         // testList = { 页面不刷新数据
         //   ep_id: resData.ep_id,
@@ -176,7 +183,8 @@ export default {
       radioValue,
       plainOptions,
       ...toRefs(checkInfo),
-      onCheck
+      onCheck,
+      ...toRefs(questionInfo)
     };
   }
 };

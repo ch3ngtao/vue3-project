@@ -81,6 +81,15 @@
         />
       </div>
       <div class="password">
+        <span class="span">图形验证</span>
+        <a-input
+          v-model:value="code"
+          placeholder="请输入"
+          style="width: 110px;height: 36px;"
+        />
+        <i @click="sendCode">发送验证码</i>
+      </div>
+      <div class="password">
         <span class="span">验证码</span>
         <a-input
           v-model:value="code"
