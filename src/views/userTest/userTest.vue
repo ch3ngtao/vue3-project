@@ -73,6 +73,8 @@
 import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs, ref } from "vue";
 import { TipsType, EpGroup } from "./userTest";
+import { useRoute } from "vue-router";
+import { getLeftMenuList, getCurrentQuestion } from "@/service/test";
 
 export default {
   components: {
@@ -84,7 +86,13 @@ export default {
       arr: []
     });
     const plainOptions = ["Apple", "Pear", "Orange"];
+    const route = useRoute();
+    const ecId = route.query.id;
+    const unit_code = route.query.unit_code;
     const activeSelect = ref("");
+    const questionInfo = reactive({
+      questionList: []
+    });
     const radioStyle = reactive({
       display: "block",
       height: "30px",
@@ -95,76 +103,9 @@ export default {
       checkList: []
     });
     //左测试题目列表
-    let testList: EpGroup = reactive({
+    const testList: EpGroup = reactive({
       ep_groups: []
     });
-    const datas = {
-      ep_id: 39,
-      ep_duration: 30,
-      ep_groups: [
-        {
-          group_name: "子证八世",
-          group_questions: [
-            {
-              no: "01",
-              answered: 0,
-              question_id: 45
-            },
-            {
-              no: "02",
-              answered: 3,
-              question_id: 3
-            },
-            {
-              no: "03",
-              answered: 0,
-              question_id: 5
-            },
-            {
-              no: "04",
-              answered: 86,
-              question_id: 45
-            },
-            {
-              no: "05",
-              answered: 3,
-              question_id: 3
-            },
-            {
-              no: "06",
-              answered: 80,
-              question_id: 5
-            }
-          ]
-        },
-        {
-          group_name: "ddd",
-          group_questions: [
-            {
-              no: "07",
-              answered: 86,
-              question_id: 45
-            },
-            {
-              no: "08",
-              answered: 3,
-              question_id: 3
-            },
-            {
-              no: "09",
-              answered: 80,
-              question_id: 5
-            }
-          ]
-        }
-      ]
-    };
-
-    testList = {
-      ep_id: datas.ep_id,
-      ep_duration: datas.ep_duration,
-      ep_groups: datas.ep_groups
-    };
 
     tips.arr = [
       {
@@ -184,24 +125,43 @@ export default {
       }
     ];
 
-    const selectQuestion = (idx: string) => {
-      activeSelect.value = idx;
-    };
-
-    const nextTest = () => {
-      testList.ep_groups.forEach(items => {
-        items.group_questions.forEach(item => {
-          if (item.no == activeSelect.value) {
-            item.answered = 1;
-          }
-        });
+    const fetchLeftMenu = () => {
+      const data = {
+        ecId: ecId,
+        unit_code: unit_code
+      };
+      getLeftMenuList(data).then((res: any) => {
+        console.log(res);
+        const resData = res.data.data;
+        // testList = { 页面不刷新数据
+        //   ep_id: resData.ep_id,
+        //   ep_duration: resData.ep_duration,
+        //   ep_groups: resData.ep_groups
+        // };
+        Object.assign(testList, resData);
       });
-      const index = Number(activeSelect.value) + 1;
-      if (index < 10) {
-        activeSelect.value = `0${index}`;
-      } else {
-        activeSelect.value = `${index}`;
-      }
+    };
+    fetchLeftMenu();
+
+    const selectQuestion = (no: string) => {
+      activeSelect.value = no;
+      const data = {
+        ecId: ecId,
+        no,
+        unit_code
+      };
+      getCurrentQuestion(data).then((res: any) => {
+        console.log(res);
+        const resData: [] = res.data.data;
+        questionInfo.questionList = resData;
+
+        // testList = { 页面不刷新数据
+        //   ep_id: resData.ep_id,
+        //   ep_duration: resData.ep_duration,
+        //   ep_groups: resData.ep_groups
+        // };
+        // Object.assign(testList, resData);
+      });
     };
 
     const onChange = (e: any) => {
@@ -211,6 +171,7 @@ export default {
     const onCheck = () => {
       console.log(checkInfo.checkList);
     };
+    console.log(testList, "testList");
 
     return {
       ...toRefs(tips),
@@ -223,7 +184,7 @@ export default {
       plainOptions,
       ...toRefs(checkInfo),
       onCheck,
-      nextTest
+      ...toRefs(questionInfo)
     };
   }
 };
@@ -277,6 +238,7 @@ export default {
         border: 1px solid #ddd;
         margin: 2px 8px;
         cursor: pointer;
+        overflow: hidden;
       }
       .answered {
         background: #1890ff;

@@ -3,7 +3,7 @@
     <div class="head">
       <div class="logo"></div>
       <div class="title">中国新青年</div>
-      <div class="login" v-if="false">
+      <div class="login" v-if="true">
         <a-button type="primary" @click="loginModal = true">
           登录
         </a-button>
@@ -27,10 +27,10 @@
       @ok="loginIn"
     >
       <div class="user">
-        <span class="span">用户名</span>
+        <span class="span">手机号</span>
         <a-input
           v-model:value="key"
-          placeholder="请输入用户名"
+          placeholder="请输入手机号"
           style="width: 200px;height: 36px"
         />
       </div>
@@ -57,10 +57,10 @@
       @ok="register"
     >
       <div class="user">
-        <span class="span">用户名</span>
+        <span class="span">手机号</span>
         <a-input
           v-model:value="key"
-          placeholder="请输入用户名"
+          placeholder="请输入手机号"
           style="width: 200px;height: 36px"
         />
       </div>
@@ -80,6 +80,24 @@
           style="width: 200px;height: 36px"
         />
       </div>
+      <div class="password">
+        <span class="span">图形验证</span>
+        <a-input
+          v-model:value="code"
+          placeholder="请输入"
+          style="width: 110px;height: 36px;"
+        />
+        <i @click="sendCode">发送验证码</i>
+      </div>
+      <div class="password">
+        <span class="span">验证码</span>
+        <a-input
+          v-model:value="code"
+          placeholder="请输入验证码"
+          style="width: 110px;height: 36px;"
+        />
+        <i @click="sendCode">发送验证码</i>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -87,10 +105,12 @@
 <script lang="ts">
 import { reactive, ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
+import { userRegister, userLogin, getCode } from "@/service/user";
 interface UserInfoType {
   key: number | string;
   password: number | string;
   checkpassword?: number | string;
+  code?: number | string;
 }
 export default {
   setup() {
@@ -99,18 +119,30 @@ export default {
     const userInfo: UserInfoType = reactive({
       key: "",
       password: "",
-      checkpassword: ""
+      checkpassword: "",
+      code: ""
     });
     const router = useRouter();
 
-    const loginIn = (e: object) => {
-      console.log(e);
+    //验证码
+    const sendCode = () => {
+      getCode().then((res: any) => {
+        console.log(res);
+      });
     };
-
-    const register = (e: object) => {
-      console.log(e);
+    //登录
+    const loginIn = () => {
+      userLogin(userInfo).then((res: any) => {
+        console.log(res);
+      });
     };
-
+    //注册
+    const register = () => {
+      userRegister(userInfo).then((res: any) => {
+        console.log(res);
+      });
+    };
+    //跳转个人中心
     const toUserCenter = () => {
       router.push({
         path: "/userCenter"
@@ -122,7 +154,8 @@ export default {
       ...toRefs(userInfo),
       loginIn,
       register,
-      toUserCenter
+      toUserCenter,
+      sendCode
     };
   }
 };
@@ -204,6 +237,16 @@ export default {
     display: inline-block;
     width: 60px;
     text-align: center;
+  }
+  i {
+    font-style: normal;
+    float: right;
+    font-size: 14px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    line-height: 36px;
+    border: 1px solid #ddd;
+    cursor: pointer;
   }
 }
 

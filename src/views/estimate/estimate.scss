@@ -104,6 +104,21 @@
       margin-right: 4px;
     }
   }
+  .units {
+    height: 50px;
+    .units-item {
+      float: left;
+      height: 50px;
+      width: 120px;
+      border-radius: 6px;
+      text-align: center;
+      line-height: 50px;
+      margin-right: 10px;
+      background: #e53333;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
 }
 
 /deep/.ant-select {
