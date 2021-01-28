@@ -52,7 +52,7 @@
           </div>
         </div>
         <div class="test-info">
-          <p>报名信息</p>
+          <!-- <p>报名信息</p>
           <div class="select">
             <a-select
               v-model:value="area"
@@ -78,7 +78,7 @@
                 {{ city }}
               </a-select-option>
             </a-select>
-          </div>
+          </div> -->
           <p>考试单远</p>
           <div class="units">
             <div

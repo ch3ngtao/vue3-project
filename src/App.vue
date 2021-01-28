@@ -21,9 +21,9 @@ export default {
         /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
       )
     ) {
-      document.write("手机访问.");
+      console.log("手机访问.");
     } else {
-      document.write("电脑访问.");
+      console.log("电脑访问.");
     }
   }
 };

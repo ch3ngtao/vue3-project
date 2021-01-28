@@ -11,10 +11,21 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 const config = {
-  baseURL: ''
+  baseURL: '',
+  headers: {}
 }
 
+
 const _axios = axios.create(config)
+_axios.interceptors.request.use(
+  function(config):any {
+    const token = store.state.token
+    console.log(token, "axiosToken");
+    
+    config.headers = {'Client-Token': token}
+    return config
+  }
+)
 
 const app = createApp(App)
 
