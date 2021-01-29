@@ -11,19 +11,20 @@
 <script lang="ts">
 // import components from "vue-class-component";
 // import foot from "@/components/foot/foot.vue";
+import { useStore } from "vuex";
 export default {
-  components: {
-    // foot
-  },
   setup() {
+    const store = useStore();
     if (
       navigator.userAgent.match(
         /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
       )
     ) {
       console.log("手机访问.");
+      store.commit("setVisitOrigin", "mobile");
     } else {
       console.log("电脑访问.");
+      store.commit("setVisitOrigin", "pc");
     }
   }
 };

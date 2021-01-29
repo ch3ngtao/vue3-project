@@ -21,7 +21,7 @@ export default {
     const routesObj = reactive({
       routes: [
         {
-          path: "/home",
+          path: "/",
           meta: {
             title: "首页"
           }

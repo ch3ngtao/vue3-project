@@ -1,10 +1,10 @@
-import { createStore } from "vuex";
 import { getStorage, setStorage } from "@/utils/storage";
+import { createStore } from "vuex";
 
 export default createStore({
   state: {
     token: getStorage('token') || "",
-    visitOrigin: '' //设备类，pc/手机
+    visitOrigin: '' //设备类，pc电脑/mobile手机
   },
   mutations: {
     setToken: (state, token) => {

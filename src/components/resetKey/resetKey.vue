@@ -2,15 +2,7 @@
   <div>
     <div class="form">
       <div>
-        <span>原始密码</span>
-        <a-input-password
-          v-model:value="passwordInfo.old"
-          placeholder="请输入原始密码"
-          style="width: 200px;height: 36px"
-        />
-      </div>
-      <div>
-        <span>新密码</span>
+        <span>输入密码</span>
         <a-input-password
           v-model:value="passwordInfo.new"
           placeholder="请输入新密码"
@@ -20,14 +12,23 @@
       <div>
         <span>确认密码</span>
         <a-input-password
-          v-model:value="passwordInfo.check"
-          placeholder="请再输入新密码"
+          v-model:value="passwordInfo.re_new"
+          placeholder="请确认新密码"
           style="width: 200px;height: 36px"
         />
       </div>
+      <div>
+        <span>验证码</span>
+        <a-input
+          v-model:value="passwordInfo.imageCode"
+          placeholder="图形验证码"
+          style="width: 120px;height: 36px"
+        />
+        <img src="" />
+      </div>
     </div>
     <div class="btn">
-      <a-button type="primary">
+      <a-button type="primary" @click="changePassword">
         确认
       </a-button>
     </div>
@@ -36,16 +37,30 @@
 
 <script lang="ts">
 import { reactive } from "vue";
+import { changePassWord } from "@/service/user";
 export default {
   setup() {
     const passwordInfo = reactive({
-      old: "",
       new: "",
-      check: ""
+      re_new: "",
+      imageCode: ""
     });
 
+    const changePassword = () => {
+      const data = {
+        password: passwordInfo.new,
+        re_password: passwordInfo.re_new,
+        image_code: passwordInfo.imageCode
+      };
+      changePassWord(data).then((res: any) => {
+        console.log(res);
+      });
+    };
+
     return {
-      passwordInfo
+      passwordInfo,
+      // methods
+      changePassword
     };
   }
 };
@@ -65,6 +80,11 @@ export default {
     }
     input {
       margin-top: 10px;
+    }
+    img {
+      vertical-align: bottom;
+      height: 36px;
+      width: 90px;
     }
   }
 }

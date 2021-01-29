@@ -42,14 +42,13 @@
         </div>
         <div class="question-content">
           <a-radio-group v-model:value="radioValue" @change="onChange">
-            <a-radio :style="radioStyle" :value="'A'">
-              Option A
-            </a-radio>
-            <a-radio :style="radioStyle" :value="'B'">
-              Option B
-            </a-radio>
-            <a-radio :style="radioStyle" :value="'C'">
-              Option C
+            <a-radio
+              :style="radioStyle"
+              :value="item.option"
+              v-for="item in jsonArr"
+              :key="item.id"
+            >
+              {{ item.label }}
             </a-radio>
           </a-radio-group>
 
@@ -135,6 +134,11 @@ export default {
         color: "white"
       }
     ];
+    const jsonArr = JSON.parse(
+      '[{"option":"A","label":"选项A：阿基米德"},{"option":"B","label":"选项B：普罗米修斯"},{"option":"C","label":"选项C：牛顿"},{"option":"D","label":"选项D：福尔摩斯"}]'
+    );
+    console.log(jsonArr);
+    const activeIndex = ref(0);
     //每道题的问题
     const selectQuestion = (no: string) => {
       activeSelect.value = no;
@@ -145,7 +149,7 @@ export default {
       };
       getCurrentQuestion(data).then((res: any) => {
         console.log(res);
-        const resData: [] = res.data.data;
+        const resData: [] = res.data;
         questionInfo.questionList = resData;
       });
     };
@@ -156,7 +160,7 @@ export default {
         unit_code: unit_code
       };
       getLeftMenuList(data).then((res: any) => {
-        const resData = res.data.data;
+        const resData = res.data;
         Object.assign(testList, resData);
         selectQuestion(testList.ep_groups[0].group_questions[0].no);
       });
@@ -191,19 +195,21 @@ export default {
     };
 
     return {
-      ...toRefs(tips),
-      testList,
-      selectQuestion,
-      activeSelect,
+      ...toRefs(tips), //题目状态展示
+      testList, //左侧试题列表
+      activeSelect, //当前选择问题
       radioStyle,
+      radioValue, //单选
+      plainOptions, //多选菜单
+      ...toRefs(checkInfo), //多选
+      ...toRefs(questionInfo), //试题信息
+      jsonArr,
+      // methods
       onChange,
-      radioValue,
-      plainOptions,
-      ...toRefs(checkInfo),
       onCheck,
-      ...toRefs(questionInfo),
+      submitTest,
       nextTest,
-      submitTest
+      selectQuestion
     };
   }
 };

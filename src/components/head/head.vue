@@ -1,8 +1,10 @@
 <template>
   <div>
     <div class="head">
-      <div class="logo"></div>
-      <div class="title">中国新青年</div>
+      <div class="logo">
+        <img src="../../assets/images/logo-img.png" alt="" />
+      </div>
+      <div class="title"></div>
       <div class="login" v-if="!token">
         <a-button type="primary" @click="loginModal = true">
           登录
@@ -83,11 +85,11 @@
       <div class="password">
         <span class="span">图形验证</span>
         <a-input
-          v-model:value="code"
+          v-model:value="image_code"
           placeholder="请输入"
           style="width: 110px;height: 36px;"
         />
-        <i @click="sendCode">发送验证码</i>
+        <img :src="imgCode" @click="getImageCode" class="image" />
       </div>
       <div class="password">
         <span class="span">验证码</span>
@@ -96,7 +98,7 @@
           placeholder="请输入验证码"
           style="width: 110px;height: 36px;"
         />
-        <i @click="sendCode">发送验证码</i>
+        <i @click="sendCode">{{ showDesc }}</i>
       </div>
     </a-modal>
   </div>
@@ -105,12 +107,13 @@
 <script lang="ts">
 import { reactive, ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
-import { userRegister, userLogin, getCode } from "@/service/user";
+import { userRegister, userLogin, getCode, getImage } from "@/service/user";
 interface UserInfoType {
   key: number | string;
   password: number | string;
   checkpassword?: number | string;
   code?: number | string;
+  image_code?: number | string;
 }
 import { useStore } from "vuex";
 import { message } from "ant-design-vue";
@@ -122,27 +125,61 @@ export default {
       key: "",
       password: "",
       checkpassword: "",
-      code: ""
+      code: "",
+      image_code: ""
     });
+    const imgCode = ref("");
     const router = useRouter();
     const store = useStore();
     console.log(store.state.token, "token");
+    const durtime = ref(0);
+    const showDesc = ref("发送验证码");
+    let timer: any;
+    let shouldRequest = true;
+    // 倒计时;
+    const coutTime = () => {
+      if (durtime.value == 0) {
+        showDesc.value = "再次发送";
+        shouldRequest = true;
+        return;
+      }
+      durtime.value--;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      showDesc.value = durtime.value + "s";
+      timer = setTimeout(coutTime, 1e3);
+    };
 
-    //验证码
+    //短信验证码
     const sendCode = () => {
-      getCode().then((res: any) => {
-        console.log(res);
+      durtime.value = 60;
+      coutTime();
+      if (shouldRequest) {
+        shouldRequest = false;
+        getCode(userInfo.image_code).then((res: any) => {
+          console.log(res);
+        });
+      }
+    };
+
+    //获取图形验证码
+    const getImageCode = () => {
+      getImage().then((res: any) => {
+        imgCode.value = res.data;
       });
     };
+
+    getImageCode();
     //登录
     const loginIn = () => {
       userLogin(userInfo).then((res: any) => {
         console.log(res);
-        if (res.data && res.data.data.token) {
+        if (res.data && res.data.token) {
           loginModal.value = false;
-          store.commit("setToken", res.data.data.token);
+          store.commit("setToken", res.data.token);
         } else {
-          message.info("请重新输入正确密码");
+          message.info("密码错误");
         }
       });
     };
@@ -161,13 +198,17 @@ export default {
     return {
       loginModal,
       registerModal,
-      ...toRefs(userInfo),
+      ...toRefs(userInfo), //用户登录信息
+      ...toRefs(store.state),
+      message, //组件
+      showDesc, //发送验证码
+      imgCode, //图片验证码地址
+      // methods
       loginIn,
       register,
       toUserCenter,
       sendCode,
-      ...toRefs(store.state),
-      message
+      getImageCode
     };
   }
 };
@@ -186,14 +227,17 @@ export default {
   .logo {
     float: left;
     width: 100px;
-    height: 100px;
-    background: #ccc;
+    height: 110px;
     border-radius: 50%;
     @media screen and (max-width: 550px) {
       width: 50px;
-      height: 50px;
+      height: 60px;
       margin-top: 15px;
       margin-left: 15px;
+    }
+    img {
+      height: 100%;
+      width: 100%;
     }
   }
   .title {
@@ -241,7 +285,7 @@ export default {
   .span {
     display: inline-block;
     width: 60px;
-    text-align: center;
+    text-align: left;
   }
 }
 .password {
@@ -249,7 +293,7 @@ export default {
   .span {
     display: inline-block;
     width: 60px;
-    text-align: center;
+    text-align: left;
   }
   i {
     font-style: normal;
@@ -260,6 +304,14 @@ export default {
     line-height: 36px;
     border: 1px solid #ddd;
     cursor: pointer;
+    height: 38px;
+    width: 90px;
+    font-size: 12px;
+  }
+  .image {
+    float: right;
+    height: 38px;
+    width: 90px;
   }
 }
 

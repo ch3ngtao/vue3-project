@@ -1,5 +1,5 @@
 import config from "@/config/config";
-import axios from 'axios';
+import _axios from '../utils/axios';
 
 interface CurrentQuestionType {
   ecId: any,
@@ -16,7 +16,7 @@ interface SubmitQuestionType {
 
 //试卷分类列表
 export function getTestClass (id: number) {
-  return axios({
+  return _axios({
     method: "get",
     url: config.baseUrl + "4191802",
     params: {
@@ -27,7 +27,7 @@ export function getTestClass (id: number) {
 
 //选择的科目信息
 export function getSelectClass (id: number) {
-  return axios({
+  return _axios({
     method: "get",
     url: config.baseUrl + "4146020",
     params: {
@@ -37,10 +37,10 @@ export function getSelectClass (id: number) {
 }
 //左侧题目栏
 export function getLeftMenuList (data: CurrentQuestionType) {
-  return axios({
-    method: "get",
+  return _axios({
+    method: "post",
     url: config.baseUrl + "4174302",
-    params: {
+    data: {
       ec_id: data.ecId,
       unit_code: data.unit_code
     }
@@ -48,20 +48,19 @@ export function getLeftMenuList (data: CurrentQuestionType) {
 }
 //右侧题目
 export function getCurrentQuestion (data: CurrentQuestionType) {
-  return axios({
+  return _axios({
     method: "get",
     url: config.baseUrl + "4192015",
     params: {
       ec_id: data.ecId,
       question_id: data.no,
       unit_code: data.unit_code
-    },
-    headers: { "Client-Token": "" }
+    }
   })
 }
 //提交试题
 export function submitQuestion (data: SubmitQuestionType) {
-  return axios({
+  return _axios({
     method: "post",
     url: config.baseUrl + "4146471",
     data: {
@@ -69,19 +68,17 @@ export function submitQuestion (data: SubmitQuestionType) {
       answer: data.answer,
       ep_id: data.ep_id,
       unit_code: data.unit_code
-    },
-    headers: { "Client-Token": "" }
+    }
   })
 }
 
 //提交试卷
 export function submitTestCard (id:number|string) {
-  return axios({
+  return _axios({
     method: "post",
     url: config.baseUrl + "4202521",
     data: {
       ep_id: id
-    },
-    headers: { "Client-Token": "" }
+    }
   })
 }

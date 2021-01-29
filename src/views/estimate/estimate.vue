@@ -79,7 +79,7 @@
               </a-select-option>
             </a-select>
           </div> -->
-          <p>考试单远</p>
+          <p>考试单元</p>
           <div class="units">
             <div
               class="units-item"
@@ -99,10 +99,11 @@
 </template>
 
 <script lang="ts">
-import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs, ref } from "vue";
 import { useRouter } from "vue-router";
 import { getTestClass, getSelectClass } from "@/service/test";
+import { useStore } from "vuex";
+import { message } from "ant-design-vue";
 interface City {
   [key: string]: string[];
 }
@@ -130,9 +131,6 @@ interface SubjectTestsInfoType {
 }
 
 export default {
-  components: {
-    bread
-  },
   setup() {
     const activeIndex = ref();
     const ecId = ref(); //科目id
@@ -150,6 +148,7 @@ export default {
       classes: "",
       subject: ""
     });
+    const store = useStore();
     const cities: string[] = reactive([]);
     const testClass: TestClassType = reactive({});
     const router = useRouter();
@@ -164,40 +163,47 @@ export default {
       activeIndex.value = i;
       ecId.value = ec_id;
       getSelectClass(ecId.value).then((res: any) => {
-        subjectTestsInfo.subjectTestsList = res.data.data;
+        subjectTestsInfo.subjectTestsList = res.data;
       });
       console.log(i);
     };
     //初始化列表
     const fetchClass = () => {
       getTestClass(1).then((res: any) => {
-        testClass.subjects = res.data.data;
-        ecId.value = res.data.data[0].ec_id;
+        console.log(res, "estamite");
+
+        testClass.subjects = res.data;
+        ecId.value = res.data[0].ec_id;
         selectSubject(0, ecId.value);
       });
     };
     fetchClass();
 
     const toTestPage = (idx: number) => {
-      router.push({
-        path: "/userTest",
-        query: {
-          id: ecId.value,
-          unit_code: idx ? `unit_${idx + 1}` : ""
-        }
-      });
+      if (store.state.token) {
+        router.push({
+          path: "/userTest",
+          query: {
+            id: ecId.value,
+            unit_code: idx ? `unit_${idx + 1}` : ""
+          }
+        });
+      } else {
+        message.info("请登录");
+      }
     };
     return {
-      testClass,
-      provinceData,
-      ...toRefs(testInfo),
+      testClass, //分类科目
+      provinceData, //地区信息
+      ...toRefs(testInfo), //报名信息
+      cities, //城市
+      ...toRefs(subjectTestsInfo),
+
+      //methods
       handleProvinceChange,
-      cities,
       toTestPage,
-      router,
       fetchClass,
-      selectSubject,
-      ...toRefs(subjectTestsInfo)
+      selectSubject
     };
   }
 };
