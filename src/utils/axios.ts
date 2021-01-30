@@ -23,7 +23,8 @@ _axios.interceptors.request.use(
     console.log(token, "axiosToken");
     config.headers = {
       'Client-Type': type,
-      'Client-Token': token
+      'Client-Token': token,
+      'Access-control-Allow-Origin': '*' 
     }
     if(config.method === 'post') {
       

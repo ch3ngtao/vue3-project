@@ -63,7 +63,7 @@ export function getCode (id?:number|string) {
 export function getImage () {
   return _axios({
     method: "get",
-    url: config.baseUrl + "4192095",
+    url: "/api" + "/v1/captcha/image",
     params: {
       uuid: Math.random()
         .toString(36)
