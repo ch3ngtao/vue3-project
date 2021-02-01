@@ -9,6 +9,7 @@
           <li
             v-for="(item, index) in testClass.subjects"
             :key="item.ec_id"
+            :class="{ active: activeIndex == index }"
             @click="selectSubject(index, item.ec_id)"
           >
             {{ item.ec_name }}
@@ -44,9 +45,7 @@
         </div>
         <div class="time">
           <p>考试时间</p>
-          <div class="limit-time">
-            {{ subjectTestsList[0].start_at }}—{{ subjectTestsList[0].end_at }}
-          </div>
+          <div class="limit-time">{{ startTime }}—{{ endTime }}</div>
           <div class="tips">
             请在规定时间内随时参加考试，自行预留答题时间，超过开放时间则自动交卷。
           </div>
@@ -83,7 +82,7 @@
           <div class="units">
             <div
               class="units-item"
-              v-for="item in 4"
+              v-for="item in subjectTestsList[0].unit"
               :key="item"
               @click="toTestPage(item)"
             >
@@ -91,7 +90,13 @@
             </div>
           </div>
         </div>
-        <div class="btn-test" @click="toTestPage(null)">开始考试</div>
+        <div
+          class="btn-test"
+          v-if="!subjectTestsList[0].unit"
+          @click="toTestPage(null)"
+        >
+          开始考试
+        </div>
       </div>
     </div>
     <foot-com />
@@ -99,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, ref } from "vue";
+import { reactive, toRefs, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { getTestClass, getSelectClass } from "@/service/test";
 import { useStore } from "vuex";
@@ -167,6 +172,23 @@ export default {
       });
       console.log(i);
     };
+
+    const startTime = computed(() => {
+      const timeSnap = new Date(subjectTestsInfo.subjectTestsList[0].start_at);
+      const y = timeSnap.getFullYear();
+      const m = timeSnap.getMonth() + 1;
+      const d = timeSnap.getDate();
+      return `${y}年${m}月${d}日`;
+    });
+
+    const endTime = computed(() => {
+      const timeSnap = new Date(subjectTestsInfo.subjectTestsList[0].end_at);
+      const y = timeSnap.getFullYear();
+      const m = timeSnap.getMonth() + 1;
+      const d = timeSnap.getDate();
+      return `${y}年${m}月${d}日`;
+    });
+
     //初始化列表
     const fetchClass = () => {
       getTestClass(1).then((res: any) => {
@@ -198,12 +220,15 @@ export default {
       ...toRefs(testInfo), //报名信息
       cities, //城市
       ...toRefs(subjectTestsInfo),
+      activeIndex,
 
       //methods
       handleProvinceChange,
       toTestPage,
       fetchClass,
-      selectSubject
+      selectSubject,
+      startTime,
+      endTime
     };
   }
 };

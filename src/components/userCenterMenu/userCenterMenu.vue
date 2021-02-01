@@ -3,7 +3,7 @@
     <div class="slide-menu" id="slide-menu">
       <div class="center-head">
         <div class="avatar"></div>
-        <p>用户的昵称</p>
+        <p>{{ userInfo.member_nickname }}</p>
       </div>
       <div>
         <a-menu style="width: 100%" mode="vertical" @click="handleClick">
@@ -24,10 +24,12 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { ref, toRefs } from "vue";
+import { useStore } from "vuex";
 export default {
   setup() {
     const showSlide = ref(0);
+    const store = useStore();
 
     const handleClick = (e: Record<string, any>) => {
       console.log(e);
@@ -50,7 +52,8 @@ export default {
 
     return {
       handleClick,
-      slideMenu
+      slideMenu,
+      ...toRefs(store.state)
     };
   }
 };

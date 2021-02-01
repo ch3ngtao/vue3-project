@@ -1,4 +1,5 @@
 import axios from "axios";
+import qs from 'qs';
 import { Md5 } from "ts-md5";
 import store from "../store";
 
@@ -21,10 +22,12 @@ _axios.interceptors.request.use(
     const token = store.state.token
     const type = store.state.visitOrigin
     console.log(token, "axiosToken");
+    config.url = '/api' + config.url
     config.headers = {
       'Client-Type': type,
       'Client-Token': token,
-      'Access-control-Allow-Origin': '*' 
+      'Access-control-Allow-Origin': '*' ,
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
     if(config.method === 'post') {
       
@@ -33,6 +36,7 @@ _axios.interceptors.request.use(
       
       config.data._signature = _signature,
       config.data._random = _random
+      config.data = qs.stringify(config.data)
       
     }
     return config

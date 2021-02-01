@@ -4,7 +4,7 @@
       <div>
         <span>输入密码</span>
         <a-input-password
-          v-model:value="passwordInfo.new"
+          v-model:value="new_pass"
           placeholder="请输入新密码"
           style="width: 200px;height: 36px"
         />
@@ -12,7 +12,7 @@
       <div>
         <span>确认密码</span>
         <a-input-password
-          v-model:value="passwordInfo.re_new"
+          v-model:value="re_new"
           placeholder="请确认新密码"
           style="width: 200px;height: 36px"
         />
@@ -20,11 +20,11 @@
       <div>
         <span>验证码</span>
         <a-input
-          v-model:value="passwordInfo.imageCode"
+          v-model:value="imageCode"
           placeholder="图形验证码"
           style="width: 120px;height: 36px"
         />
-        <img src="" />
+        <img :src="code_img" @click="getImageCode" />
       </div>
     </div>
     <div class="btn">
@@ -36,31 +36,48 @@
 </template>
 
 <script lang="ts">
-import { reactive } from "vue";
-import { changePassWord } from "@/service/user";
+import { reactive, ref, toRefs } from "vue";
+import { changePassWord, getImage } from "@/service/user";
+import { removeStorage } from "../../utils/storage";
+import { useStore } from "vuex";
 export default {
   setup() {
     const passwordInfo = reactive({
-      new: "",
+      new_pass: "",
       re_new: "",
       imageCode: ""
     });
 
+    const store = useStore();
+
+    const code_img = ref("");
+
     const changePassword = () => {
       const data = {
-        password: passwordInfo.new,
+        password: passwordInfo.new_pass,
         re_password: passwordInfo.re_new,
         image_code: passwordInfo.imageCode
       };
       changePassWord(data).then((res: any) => {
         console.log(res);
+        removeStorage("token");
+        store.commit("setToken", "");
       });
     };
 
+    const getImageCode = () => {
+      getImage().then(res => {
+        code_img.value = res.data;
+      });
+    };
+    getImageCode();
+
     return {
-      passwordInfo,
+      ...toRefs(passwordInfo),
+      code_img, //图片地址
       // methods
-      changePassword
+      changePassword,
+      getImageCode
     };
   }
 };

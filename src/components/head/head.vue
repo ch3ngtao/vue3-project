@@ -44,6 +44,15 @@
           style="width: 200px;height: 36px"
         />
       </div>
+      <div class="password">
+        <span class="span">验证码</span>
+        <a-input
+          v-model:value="image_code"
+          placeholder="请输入"
+          style="width: 110px;height: 36px;"
+        />
+        <img :src="imgCode" @click="getImageCode" class="image" />
+      </div>
     </a-modal>
 
     <a-modal
@@ -105,15 +114,21 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, toRefs } from "vue";
+import { reactive, ref, toRefs, watch, watchEffect } from "vue";
 import { useRouter } from "vue-router";
-import { userRegister, userLogin, getCode, getImage } from "@/service/user";
+import {
+  userRegister,
+  userLogin,
+  getCode,
+  getImage,
+  GetUserInfo
+} from "@/service/user";
 interface UserInfoType {
-  key: number | string;
+  key: number | null;
   password: number | string;
+  image_code: string;
   checkpassword?: number | string;
   code?: number | string;
-  image_code?: number | string;
 }
 import { useStore } from "vuex";
 import { message } from "ant-design-vue";
@@ -122,7 +137,7 @@ export default {
     const registerModal = ref(false);
     const loginModal = ref(false);
     const userInfo: UserInfoType = reactive({
-      key: "",
+      key: null,
       password: "",
       checkpassword: "",
       code: "",
@@ -153,11 +168,11 @@ export default {
 
     //短信验证码
     const sendCode = () => {
-      durtime.value = 60;
-      coutTime();
       if (shouldRequest) {
         shouldRequest = false;
-        getCode(userInfo.image_code).then((res: any) => {
+        durtime.value = 60;
+        coutTime();
+        getCode(userInfo.key, userInfo.image_code).then((res: any) => {
           console.log(res);
         });
       }
@@ -169,8 +184,21 @@ export default {
         imgCode.value = res.data;
       });
     };
+    //跟新用户信息
+    const upDateUserInfo = () => {
+      GetUserInfo().then((res: any) => {
+        console.log(res);
+        store.commit("setUserInfo", res.data);
+      });
+    };
 
-    getImageCode();
+    watch([registerModal, loginModal], newVal => {
+      newVal.forEach(item => {
+        if (item) {
+          getImageCode();
+        }
+      });
+    });
     //登录
     const loginIn = () => {
       userLogin(userInfo).then((res: any) => {
@@ -178,6 +206,7 @@ export default {
         if (res.data && res.data.token) {
           loginModal.value = false;
           store.commit("setToken", res.data.token);
+          upDateUserInfo();
         } else {
           message.info("密码错误");
         }

@@ -4,6 +4,7 @@ import { createStore } from "vuex";
 export default createStore({
   state: {
     token: getStorage('token') || "",
+    userInfo: {},
     visitOrigin: '' //设备类，pc电脑/mobile手机
   },
   mutations: {
@@ -13,17 +14,24 @@ export default createStore({
     },
     setVisitOrigin: (state, type) => {
       state.visitOrigin = type
+    },
+    setUserInfo: (state, info) => {
+      state.userInfo = info
     }
   },
   actions: {
      // token
     setToken({ commit }, token) {
       setStorage('token', token)
-      commit('increment', token);
+      commit('setToken', token);
     },
 
     setVisitOrigin({ commit }, type) {
       commit('setVisitOrigin', type)
+    },
+
+    setUserInfo({ commit }, info) {
+      commit("setUserInfo", info)
     }
   },
   modules: {}

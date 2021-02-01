@@ -1,17 +1,15 @@
 <template>
-  <div id="nav">
-    <!-- <head-nav /> -->
-  </div>
+  <div id="nav"></div>
   <div>
     <router-view />
   </div>
-  <!-- <foot /> -->
+  <!-- <foot-com /> -->
 </template>
 
 <script lang="ts">
-// import components from "vue-class-component";
-// import foot from "@/components/foot/foot.vue";
+import _axios from "./utils/axios";
 import { useStore } from "vuex";
+import { GetUserInfo } from "./service/user";
 export default {
   setup() {
     const store = useStore();
@@ -26,6 +24,22 @@ export default {
       console.log("电脑访问.");
       store.commit("setVisitOrigin", "pc");
     }
+    const initConfig = () => {
+      _axios({
+        method: "get",
+        url: "/v1/config"
+      }).then((res: any) => {
+        console.log(res.data.ba, "config");
+      });
+    };
+    const fetchUserInfo = () => {
+      GetUserInfo().then((res: any) => {
+        console.log(res);
+        store.commit("setUserInfo", res.data);
+      });
+    };
+    fetchUserInfo();
+    initConfig();
   }
 };
 </script>

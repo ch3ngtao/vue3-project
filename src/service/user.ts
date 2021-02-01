@@ -1,10 +1,10 @@
-import config from "@/config/config";
 import { Md5 } from "ts-md5";
 import _axios from '../utils/axios';
 
 interface UserInfoType {
-  key: number | string;
+  key: number | null;
   password: number | string;
+  image_code: string;
   checkpassword?: number | string;
   code?: number | string;
 }
@@ -16,15 +16,16 @@ interface ChangePassWordType {
 }
 //用户注册
 export function userRegister (userInfo:UserInfoType) {
-  const { password, key, checkpassword, code } = userInfo
+  const { password, key, checkpassword, code, image_code } = userInfo
   return _axios({
     method: 'post',
-    url: config.baseUrl + '4145919',
+    url: "/v1/registerBySMS",
     data: {
       password,
       mobile: key,
       re_password: checkpassword,
       captcha: code,
+      image_code,
       uuid: Math.random()
         .toString(36)
         .slice(-8)
@@ -34,28 +35,30 @@ export function userRegister (userInfo:UserInfoType) {
 
 //用户登录
 export function userLogin (userInfo:UserInfoType) {
-  const { key, password } = userInfo;
+  const { key, password, image_code } = userInfo;
   const secret:string = Md5.hashStr(password.toString()).toString().toUpperCase();
   return _axios({
     method: "post",
-    url: config.baseUrl + '4174754',
+    url: "/v1/login",
     data: {
       password: secret,
-      mobile: key
+      mobile: key,
+      image_code
     }
   })
 }
 
 //发送验证码
-export function getCode (id?:number|string) {
+export function getCode (phone:number|null,id?:number|string) {
   return _axios({
-    method: "get",
-    url: config.baseUrl + "4201565",
-    params: {
+    method: "post",
+    url: "/v1/captcha/sms",
+    data: {
       uuid: Math.random()
         .toString(36)
         .slice(-8),
-      captcha: id
+      captcha: id,
+      mobile: phone
     }
   })
 }
@@ -63,7 +66,7 @@ export function getCode (id?:number|string) {
 export function getImage () {
   return _axios({
     method: "get",
-    url: "/api" + "/v1/captcha/image",
+    url: "/v1/captcha/image",
     params: {
       uuid: Math.random()
         .toString(36)
@@ -76,7 +79,7 @@ export function getImage () {
 export function changePassWord (data: ChangePassWordType) {
   return _axios({
     method: "post",
-    url: config.baseUrl + "4192095",
+    url: "/v1/member/add",
     data: {
       password: data.password,
       re_password: data.re_password,
@@ -85,5 +88,13 @@ export function changePassWord (data: ChangePassWordType) {
       .toString(36)
       .slice(-8)
     }
+  })
+}
+
+//用户信息
+export function GetUserInfo () {
+  return _axios({
+    method: "get",
+    url: "/v1/auth/member/info",
   })
 }

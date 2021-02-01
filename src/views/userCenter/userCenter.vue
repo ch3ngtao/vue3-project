@@ -19,12 +19,21 @@
 <script lang="ts">
 import slideMenu from "@/components/userCenterMenu/userCenterMenu.vue";
 import resetKey from "@/components/resetKey/resetKey.vue";
+import { useStore } from "vuex";
+import { toRefs } from "vue";
 // import components from "vue-class-component";
 
 export default {
   components: {
     slideMenu,
     resetKey
+  },
+  setup() {
+    const store = useStore();
+
+    return {
+      ...toRefs(store.state)
+    };
   }
 };
 </script>

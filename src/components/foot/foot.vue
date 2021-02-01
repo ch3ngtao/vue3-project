@@ -9,7 +9,13 @@
 </template>
 
 <script lang="ts">
-export default {};
+import { inject } from "vue";
+export default {
+  setup() {
+    const configINfo = inject("configInfo");
+    console.log(configINfo);
+  }
+};
 </script>
 
 <style lang="scss" scoped>

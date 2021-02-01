@@ -1,4 +1,3 @@
-import config from "@/config/config";
 import _axios from '../utils/axios';
 
 interface CurrentQuestionType {
@@ -18,7 +17,7 @@ interface SubmitQuestionType {
 export function getTestClass (id: number) {
   return _axios({
     method: "get",
-    url: config.baseUrl + "4191802",
+    url:'/v1/examine/categoryList',
     params: {
       ec_id: id
     }
@@ -29,7 +28,7 @@ export function getTestClass (id: number) {
 export function getSelectClass (id: number) {
   return _axios({
     method: "get",
-    url: config.baseUrl + "4146020",
+    url: '/v1/examine/paperList',
     params: {
       ec_id: id
     }
@@ -39,7 +38,7 @@ export function getSelectClass (id: number) {
 export function getLeftMenuList (data: CurrentQuestionType) {
   return _axios({
     method: "post",
-    url: config.baseUrl + "4174302",
+    url: '/v1/auth/examine/sideBar',
     data: {
       ec_id: data.ecId,
       unit_code: data.unit_code
@@ -50,7 +49,7 @@ export function getLeftMenuList (data: CurrentQuestionType) {
 export function getCurrentQuestion (data: CurrentQuestionType) {
   return _axios({
     method: "get",
-    url: config.baseUrl + "4192015",
+    url: '/v1/auth/examine/questionList',
     params: {
       ec_id: data.ecId,
       question_id: data.no,
@@ -62,7 +61,7 @@ export function getCurrentQuestion (data: CurrentQuestionType) {
 export function submitQuestion (data: SubmitQuestionType) {
   return _axios({
     method: "post",
-    url: config.baseUrl + "4146471",
+    url: '/v1/auth/question/answer',
     data: {
       question_id: data.question_id,
       answer: data.answer,
@@ -76,7 +75,7 @@ export function submitQuestion (data: SubmitQuestionType) {
 export function submitTestCard (id:number|string) {
   return _axios({
     method: "post",
-    url: config.baseUrl + "4202521",
+    url: '/v1/auth/examine/finish',
     data: {
       ep_id: id
     }
