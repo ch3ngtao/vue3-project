@@ -100,7 +100,7 @@
         />
         <img :src="imgCode" @click="getImageCode" class="image" />
       </div>
-      <div class="password">
+      <div class="password" v-if="shouldSms === 'open'">
         <span class="span">验证码</span>
         <a-input
           v-model:value="code"
@@ -114,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, toRefs, watch, watchEffect } from "vue";
+import { inject, reactive, ref, toRefs, watch, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import {
   userRegister,
@@ -136,7 +136,8 @@ export default {
   setup() {
     const registerModal = ref(false);
     const loginModal = ref(false);
-    const userInfo: UserInfoType = reactive({
+    const shouldSms = inject("sms");
+    let userInfo: UserInfoType = reactive({
       key: null,
       password: "",
       checkpassword: "",
@@ -207,6 +208,13 @@ export default {
           loginModal.value = false;
           store.commit("setToken", res.data.token);
           upDateUserInfo();
+          userInfo = {
+            key: null,
+            password: "",
+            checkpassword: "",
+            code: "",
+            image_code: ""
+          };
         } else {
           message.info("密码错误");
         }
@@ -216,6 +224,16 @@ export default {
     const register = () => {
       userRegister(userInfo).then((res: any) => {
         console.log(res);
+        if (res.message === "success") {
+          registerModal.value = false;
+          userInfo = {
+            key: null,
+            password: "",
+            checkpassword: "",
+            code: "",
+            image_code: ""
+          };
+        }
       });
     };
     //跳转个人中心
@@ -232,6 +250,7 @@ export default {
       message, //组件
       showDesc, //发送验证码
       imgCode, //图片验证码地址
+      shouldSms, //是否发生短信验证码
       // methods
       loginIn,
       register,

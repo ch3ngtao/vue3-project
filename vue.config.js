@@ -1,6 +1,6 @@
 module.exports = {
   devServer: {
-    host: "localhost",
+    host: "",
     port: 8081,
     https: false,
     hotOnly: false,
@@ -8,8 +8,8 @@ module.exports = {
     proxy: {
       "/api": {
         target: "http://47.115.16.98",
-        pathRewrite: { "^/api": "" },
-      },
-    },
-  },
+        pathRewrite: { "^/api": "" }
+      }
+    }
+  }
 };

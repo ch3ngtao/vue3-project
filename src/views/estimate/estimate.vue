@@ -51,38 +51,11 @@
           </div>
         </div>
         <div class="test-info">
-          <!-- <p>报名信息</p>
-          <div class="select">
-            <a-select
-              v-model:value="area"
-              style="width: 120px"
-              @change="handleProvinceChange"
-            >
-              <a-select-option v-for="pro in provinceData" :key="pro">
-                {{ pro }}
-              </a-select-option>
-            </a-select>
-            <a-select v-model:value="school" style="width: 120px">
-              <a-select-option v-for="city in cities" :key="city">
-                {{ city }}
-              </a-select-option>
-            </a-select>
-            <a-select v-model:value="classes" style="width: 120px">
-              <a-select-option v-for="pro in provinceData" :key="pro">
-                {{ pro }}
-              </a-select-option>
-            </a-select>
-            <a-select v-model:value="subject" style="width: 120px">
-              <a-select-option v-for="city in cities" :key="city">
-                {{ city }}
-              </a-select-option>
-            </a-select>
-          </div> -->
           <p>考试单元</p>
           <div class="units">
             <div
               class="units-item"
-              v-for="(item, index) in unitLists"
+              v-for="(item, index) in subjectTestsList[0].unit"
               :key="item"
               @click="toTestPage(item)"
             >
@@ -94,10 +67,14 @@
           class="score"
           v-if="
             !subjectTestsList[0].unit &&
+              subjectTestsList[0].ep_record &&
               subjectTestsList[0].ep_record[0].committed == 1
           "
         >
-          考试得分：{{ subjectTestsList[0].ep_record[0].member_score }}
+          考试得分：{{
+            subjectTestsList[0].ep_record &&
+              subjectTestsList[0].ep_record[0].member_score
+          }}
         </div>
         <div
           class="btn-test"
@@ -118,9 +95,6 @@ import { useRouter } from "vue-router";
 import { getTestClass, getSelectClass } from "@/service/test";
 import { useStore } from "vuex";
 import { message } from "ant-design-vue";
-interface City {
-  [key: string]: string[];
-}
 interface Sbujiect {
   ec_name: string;
   ec_id: number;
@@ -145,7 +119,7 @@ interface SubjectTestsListType {
   start_at: number;
   title: string;
   unit: number;
-  ep_record: null | [EpRecordType];
+  ep_record: [EpRecordType];
 }
 
 interface SubjectTestsInfoType {
@@ -159,11 +133,6 @@ export default {
     const subjectTestsInfo: SubjectTestsInfoType = reactive({
       subjectTestsList: []
     });
-    const provinceData = ["Zhejiang", "Jiangsu"];
-    const cityData: City = reactive({
-      Zhejiang: ["Hangzhou", "Ningbo", "Wenzhou"],
-      Jiangsu: ["Nanjing", "Suzhou", "Zhenjiang"]
-    });
     const testInfo = reactive({
       area: "",
       school: "",
@@ -171,28 +140,22 @@ export default {
       subject: ""
     });
     const store = useStore();
-    const cities: string[] = reactive([]);
     const testClass: TestClassType = reactive({});
     const router = useRouter();
     const unitList = reactive({
       unitLists: [{}]
     });
-    // let recordsInfo = reactive({});
-
-    const handleProvinceChange = (e: string) => {
-      cities.push(...cityData[e]);
-      console.log(cities);
-    };
 
     //选择科目
     const selectSubject = (i: number, ec_id: number) => {
       activeIndex.value = i;
       ecId.value = ec_id;
       unitList.unitLists = [];
+      subjectTestsInfo.subjectTestsList = [];
       getSelectClass(ecId.value).then((res: any) => {
         subjectTestsInfo.subjectTestsList = res.data;
-        const units = subjectTestsInfo.subjectTestsList[0].unit;
-        const records = subjectTestsInfo.subjectTestsList[0].ep_record;
+        const units = res.data[0].unit;
+        const records = res.data[0].ep_record || [];
         const unit_list = [];
         for (let i = 0; i < units; i++) {
           let unitObj = {};
@@ -212,6 +175,11 @@ export default {
           });
         });
         unitList.unitLists = unit_list;
+        console.log(unitList.unitLists, "unitLists");
+        console.log(
+          subjectTestsInfo.subjectTestsList,
+          "subjectTestsInfo.subjectTestsList"
+        );
       });
     };
 
@@ -258,15 +226,13 @@ export default {
     };
     return {
       testClass, //分类科目
-      provinceData, //地区信息
       ...toRefs(testInfo), //报名信息
-      cities, //城市
       ...toRefs(subjectTestsInfo),
       activeIndex,
       ...toRefs(unitList),
 
       //methods
-      handleProvinceChange,
+      // handleProvinceChange,
       toTestPage,
       fetchClass,
       selectSubject,

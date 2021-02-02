@@ -10,9 +10,14 @@
 import _axios from "./utils/axios";
 import { useStore } from "vuex";
 import { GetUserInfo } from "./service/user";
+import { provide, ref } from "vue";
 export default {
   setup() {
     const store = useStore();
+    const footInfo = ref("");
+    const shouldSms = ref("");
+    provide("footInfo", footInfo);
+    provide("sms", shouldSms);
     if (
       navigator.userAgent.match(
         /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
@@ -29,7 +34,8 @@ export default {
         method: "get",
         url: "/v1/config"
       }).then((res: any) => {
-        console.log(res.data.ba, "config");
+        footInfo.value = res.data.ba;
+        shouldSms.value = res.data.sms_captcha;
       });
     };
     const fetchUserInfo = () => {
