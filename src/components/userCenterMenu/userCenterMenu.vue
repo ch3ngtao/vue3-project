@@ -2,7 +2,9 @@
   <div>
     <div class="slide-menu" id="slide-menu">
       <div class="center-head">
-        <div class="avatar"></div>
+        <div class="avatar">
+          <img src="../../assets/images/unlogin-head.png" />
+        </div>
         <p>{{ userInfo.member_nickname }}</p>
       </div>
       <div>
@@ -92,7 +94,7 @@ export default {
       height: 100px;
       width: 100px;
       border-radius: 50%;
-      background-color: #666;
+      // background-color: #666;
       margin: 20px auto 0;
     }
     p {

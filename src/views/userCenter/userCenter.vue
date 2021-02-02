@@ -13,6 +13,7 @@
         </div>
       </div>
     </div>
+    <foot-com />
   </div>
 </template>
 

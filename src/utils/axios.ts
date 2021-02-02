@@ -21,7 +21,6 @@ _axios.interceptors.request.use(
   function(config):any {
     const token = store.state.token
     const type = store.state.visitOrigin
-    console.log(token, "axiosToken");
     config.url = '/api' + config.url
     config.headers = {
       'Client-Type': type,

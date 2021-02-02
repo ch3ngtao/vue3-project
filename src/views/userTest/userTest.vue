@@ -55,9 +55,16 @@
           <a-checkbox-group
             v-model:value="checkList"
             style="display: block"
-            :options="plainOptions"
             @change="onCheck"
-          />
+          >
+            <a-checkbox
+              :value="item.option"
+              v-for="item in jsonArr"
+              :key="item.id"
+            >
+              A{{ item.label }}
+            </a-checkbox>
+          </a-checkbox-group>
         </div>
         <div class="btns">
           <a-button type="danger">
@@ -179,6 +186,7 @@ export default {
 
     const onCheck = () => {
       console.log(checkInfo.checkList);
+      // console.log(checkInfo.checkList.sort());
     };
 
     const nextTest = () => {

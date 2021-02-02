@@ -82,13 +82,22 @@
           <div class="units">
             <div
               class="units-item"
-              v-for="item in subjectTestsList[0].unit"
+              v-for="(item, index) in unitLists"
               :key="item"
               @click="toTestPage(item)"
             >
-              第{{ item }}单元
+              第{{ index + 1 }}单元
             </div>
           </div>
+        </div>
+        <div
+          class="score"
+          v-if="
+            !subjectTestsList[0].unit &&
+              subjectTestsList[0].ep_record[0].committed == 1
+          "
+        >
+          考试得分：{{ subjectTestsList[0].ep_record[0].member_score }}
         </div>
         <div
           class="btn-test"
@@ -119,6 +128,13 @@ interface Sbujiect {
 interface TestClassType {
   subjects?: Sbujiect[];
 }
+interface EpRecordType {
+  committed: number;
+  ep_id: number;
+  ep_record_id: number;
+  member_score: number;
+  unit_code: string;
+}
 interface SubjectTestsListType {
   duration: number;
   ec_id: number;
@@ -129,6 +145,7 @@ interface SubjectTestsListType {
   start_at: number;
   title: string;
   unit: number;
+  ep_record: null | [EpRecordType];
 }
 
 interface SubjectTestsInfoType {
@@ -157,6 +174,10 @@ export default {
     const cities: string[] = reactive([]);
     const testClass: TestClassType = reactive({});
     const router = useRouter();
+    const unitList = reactive({
+      unitLists: [{}]
+    });
+    // let recordsInfo = reactive({});
 
     const handleProvinceChange = (e: string) => {
       cities.push(...cityData[e]);
@@ -167,10 +188,31 @@ export default {
     const selectSubject = (i: number, ec_id: number) => {
       activeIndex.value = i;
       ecId.value = ec_id;
+      unitList.unitLists = [];
       getSelectClass(ecId.value).then((res: any) => {
         subjectTestsInfo.subjectTestsList = res.data;
+        const units = subjectTestsInfo.subjectTestsList[0].unit;
+        const records = subjectTestsInfo.subjectTestsList[0].ep_record;
+        const unit_list = [];
+        for (let i = 0; i < units; i++) {
+          let unitObj = {};
+          unitObj = {
+            unit_code: `unit_${i + 1}`,
+            committed: 0,
+            member_score: 0
+          };
+          unit_list.push(unitObj);
+        }
+        unit_list.forEach((item: any) => {
+          records?.forEach((item2: any) => {
+            if (item.unit_code == item2.unit_code) {
+              (item.committed = item2.committed),
+                (item.member_score = item2.member_score);
+            }
+          });
+        });
+        unitList.unitLists = unit_list;
       });
-      console.log(i);
     };
 
     const startTime = computed(() => {
@@ -221,6 +263,7 @@ export default {
       cities, //城市
       ...toRefs(subjectTestsInfo),
       activeIndex,
+      ...toRefs(unitList),
 
       //methods
       handleProvinceChange,
