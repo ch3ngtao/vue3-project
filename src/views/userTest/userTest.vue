@@ -21,7 +21,7 @@
                   class="items"
                   :class="{
                     isSelect: val.no == activeSelect,
-                    answered: val.answered
+                    answered: val.answered == 1
                   }"
                   @click="selectQuestion(val.no, val.question_id)"
                 >
@@ -37,6 +37,10 @@
           </div>
         </div>
         <div class="right">
+          <div class="count-time">
+            <i class="iconfont icon-time"></i>
+            {{ countTimeStr }}
+          </div>
           <div class="question-title" v-if="questionList.length">
             <span>02</span>
             <span>{{ questionList[0].question_title }}</span>
@@ -60,21 +64,22 @@
             <!-- 多选 -->
             <a-checkbox-group
               v-model:value="checkList"
-              style="display: block"
               @change="onCheck"
               v-if="questionList[0].question_style == 2"
             >
               <a-checkbox
                 :value="item.option"
+                :style="radioStyle"
+                style="margin-left: 8px;"
                 v-for="item in jsonArr"
                 :key="item.id"
               >
-                A{{ item.label }}
+                {{ item.label }}
               </a-checkbox>
             </a-checkbox-group>
           </div>
           <div class="btns">
-            <a-button type="danger">
+            <a-button type="danger" @click="preTest">
               上一题
             </a-button>
             <a-button type="primary" @click="nextTest">
@@ -90,7 +95,7 @@
 
 <script lang="ts">
 import bread from "@/components/bread/bread.vue";
-import { reactive, toRefs, ref } from "vue";
+import { reactive, toRefs, ref, watch } from "vue";
 import { TipsType, EpGroup, QuestionInfoType } from "./userTest";
 import { useRoute } from "vue-router";
 import {
@@ -112,9 +117,12 @@ export default {
     const plainOptions = ["Apple", "Pear", "Orange"];
     const route = useRoute();
     const ecId = route.query.id;
+    const qusetion_id = ref(0);
     const unit_code = route.query.unit_code;
     const activeSelect = ref("");
     const activeIndex = ref(0);
+    const countTime = ref(0);
+    const countTimeStr = ref("");
     const questionInfo: QuestionInfoType = reactive({
       questionList: [
         {
@@ -134,9 +142,10 @@ export default {
       height: "30px",
       lineHeight: "30px"
     });
-    const radioValue = ref("");
+    const radioValue = ref("A"); //单选
     const checkInfo = reactive({
-      checkList: []
+      //多选
+      checkList: ["A", "D"]
     });
     //左测试题目列表
     const testList: EpGroup = reactive({
@@ -164,25 +173,61 @@ export default {
       }
     ];
 
-    //每道题的问题
-    const selectQuestion = (no: string, q_id: number) => {
-      activeSelect.value = no; // 01 string
-      activeIndex.value = Number(no); //1 number
+    //选项改变 重新请求右侧数据
+    watch(activeSelect, newVal => {
+      console.log(newVal);
+      testList.ep_groups.forEach(item1 => {
+        item1.group_questions.forEach(item2 => {
+          if (item2.no === newVal) {
+            qusetion_id.value = item2.question_id;
+          }
+        });
+      });
       const data = {
         ecId: ecId,
-        question_id: q_id,
+        question_id: qusetion_id.value,
         unit_code
       };
       getCurrentQuestion(data).then((res: any) => {
         console.log(res);
         const resData: [] = res.data;
+        const userRecord = res.data[0].q_record;
+        const type = res.data[0].question_style;
         questionInfo.questionList = resData;
+        //处理试卷问题列表
         rightList.jsonArr = JSON.parse(
           questionInfo.questionList[0].question_options
         );
+        if (type == 1) {
+          radioValue.value = userRecord && userRecord.member_answers;
+        } else {
+          checkInfo.checkList =
+            userRecord && userRecord.member_answers.split("");
+        }
         console.log(rightList.jsonArr, "rightList.jsonArr");
       });
+    });
+
+    //点击左侧原点
+    const selectQuestion = (no: string) => {
+      activeSelect.value = no; // 01 string
+      activeIndex.value = Number(no); //1 number
     };
+    //倒计时
+    const limitTime = () => {
+      const timeSnap = countTime.value;
+      if (timeSnap < 0) {
+        //答题时间结束
+        return;
+      }
+      const h = Math.floor((timeSnap / 1000 / 60 / 60) % 24);
+      const m = Math.floor((timeSnap / 1000 / 60) % 60);
+      const s = Math.floor((timeSnap / 1000) % 60);
+      countTimeStr.value = `${h}:${m}:${s}`;
+      countTime.value -= 1000;
+      setTimeout(limitTime, 1e3);
+    };
+
     //获取左边问题栏问题
     const fetchLeftMenu = () => {
       const data = {
@@ -191,11 +236,10 @@ export default {
       };
       getLeftMenuList(data).then((res: any) => {
         const resData = res.data;
+        countTime.value = res.data.ep_duration;
+        limitTime();
         Object.assign(testList, resData);
-        selectQuestion(
-          testList.ep_groups[0].group_questions[0].no,
-          testList.ep_groups[0].group_questions[0].question_id
-        );
+        selectQuestion(testList.ep_groups[0].group_questions[0].no);
       });
     };
     fetchLeftMenu();
@@ -211,8 +255,8 @@ export default {
     };
 
     const onCheck = () => {
-      console.log(checkInfo.checkList);
-      // console.log(checkInfo.checkList.sort());
+      // console.log(checkInfo.checkList);
+      console.log(checkInfo.checkList.sort());
     };
 
     const nextTest = () => {
@@ -234,6 +278,15 @@ export default {
       });
     };
 
+    const preTest = () => {
+      activeIndex.value--;
+      if (activeIndex.value > 9) {
+        activeSelect.value = activeIndex.value.toString();
+      } else {
+        activeSelect.value = `0${activeIndex.value}`;
+      }
+    };
+
     return {
       ...toRefs(tips), //题目状态展示
       testList, //左侧试题列表
@@ -244,12 +297,14 @@ export default {
       ...toRefs(checkInfo), //多选
       ...toRefs(questionInfo), //试题信息
       ...toRefs(rightList),
+      countTimeStr,
       // methods
       onChange,
       onCheck,
       submitTest,
       nextTest,
-      selectQuestion
+      selectQuestion,
+      preTest
     };
   }
 };
@@ -327,12 +382,25 @@ export default {
   }
 }
 .right {
+  position: relative;
   float: left;
   width: 60%;
   padding-left: 20px;
   height: 100%;
   @media screen and (max-width: 550px) {
     width: 100%;
+  }
+  .count-time {
+    position: absolute;
+    right: -100px;
+    font-size: 28px;
+    i {
+      font-size: 16px;
+    }
+    @media screen and (max-width: 550px) {
+      right: 30px;
+      font-size: 16px;
+    }
   }
   .question-title {
     font-size: 18px;

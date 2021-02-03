@@ -1,3 +1,4 @@
+// import Configs from '@/config/config';
 import axios from "axios";
 import qs from 'qs';
 import { Md5 } from "ts-md5";
@@ -22,6 +23,7 @@ _axios.interceptors.request.use(
     const token = store.state.token
     const type = store.state.visitOrigin
     config.url = '/api' + config.url
+    // config.url = Configs.apiUrl + config.url
     config.headers = {
       'Client-Type': type,
       'Client-Token': token,
