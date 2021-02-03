@@ -34,7 +34,7 @@ export default {
         method: "get",
         url: "/v1/config"
       }).then((res: any) => {
-        footInfo.value = res.data.ba;
+        footInfo.value = res.data.site_ba;
         shouldSms.value = res.data.sms_captcha;
       });
     };

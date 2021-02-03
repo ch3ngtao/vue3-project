@@ -3,76 +3,84 @@
     <head-com />
     <div class="fill-content">
       <bread />
-      <div class="left">
-        <div class="tips">
-          <div v-for="item in arr" :key="item.id" class="tips-item">
-            <div :style="{ backgroundColor: item.color }"></div>
-            <p>{{ item.desc }}</p>
+      <div class="content">
+        <div class="left">
+          <div class="tips">
+            <div v-for="item in arr" :key="item.id" class="tips-item">
+              <div :style="{ backgroundColor: item.color }"></div>
+              <p>{{ item.desc }}</p>
+            </div>
           </div>
-        </div>
-        <div class="test-list">
-          <div v-for="item in testList.ep_groups" :key="item.id">
-            <p>{{ item.group_name }}</p>
-            <div class="list">
-              <div
-                v-for="val in item.group_questions"
-                :key="val.id"
-                class="items"
-                :class="{
-                  isSelect: val.no == activeSelect,
-                  answered: val.answered
-                }"
-                @click="selectQuestion(val.no)"
-              >
-                {{ val.no }}
+          <div class="test-list">
+            <div v-for="item in testList.ep_groups" :key="item.id">
+              <p>{{ item.group_name }}</p>
+              <div class="list">
+                <div
+                  v-for="val in item.group_questions"
+                  :key="val.id"
+                  class="items"
+                  :class="{
+                    isSelect: val.no == activeSelect,
+                    answered: val.answered
+                  }"
+                  @click="selectQuestion(val.no, val.question_id)"
+                >
+                  {{ val.no }}
+                </div>
               </div>
             </div>
           </div>
+          <div class="btn-submit">
+            <a-button type="primary" @click="submitTest">
+              提交试卷
+            </a-button>
+          </div>
         </div>
-        <div class="btn-submit">
-          <a-button type="primary" @click="submitTest">
-            提交试卷
-          </a-button>
-        </div>
-      </div>
-      <div class="right">
-        <div class="question-title" v-if="questionList.length">
-          <span>02</span>
-          <span>{{ questionList[0].question_title }}</span>
-        </div>
-        <div class="question-content">
-          <a-radio-group v-model:value="radioValue" @change="onChange">
-            <a-radio
-              :style="radioStyle"
-              :value="item.option"
-              v-for="item in jsonArr"
-              :key="item.id"
+        <div class="right">
+          <div class="question-title" v-if="questionList.length">
+            <span>02</span>
+            <span>{{ questionList[0].question_title }}</span>
+          </div>
+          <!-- 单选 -->
+          <div class="question-content">
+            <a-radio-group
+              v-model:value="radioValue"
+              @change="onChange"
+              v-if="questionList[0].question_style == 1"
             >
-              {{ item.label }}
-            </a-radio>
-          </a-radio-group>
-
-          <a-checkbox-group
-            v-model:value="checkList"
-            style="display: block"
-            @change="onCheck"
-          >
-            <a-checkbox
-              :value="item.option"
-              v-for="item in jsonArr"
-              :key="item.id"
+              <a-radio
+                :style="radioStyle"
+                :value="item.option"
+                v-for="item in jsonArr"
+                :key="item.id"
+              >
+                {{ item.label }}
+              </a-radio>
+            </a-radio-group>
+            <!-- 多选 -->
+            <a-checkbox-group
+              v-model:value="checkList"
+              style="display: block"
+              @change="onCheck"
+              v-if="questionList[0].question_style == 2"
             >
-              A{{ item.label }}
-            </a-checkbox>
-          </a-checkbox-group>
-        </div>
-        <div class="btns">
-          <a-button type="danger">
-            上一题
-          </a-button>
-          <a-button type="primary" @click="nextTest">
-            下一题
-          </a-button>
+              <a-checkbox
+                :value="item.option"
+                v-for="item in jsonArr"
+                :key="item.id"
+              >
+                A{{ item.label }}
+              </a-checkbox>
+            </a-checkbox-group>
+          </div>
+          <div class="btns">
+            <a-button type="danger">
+              上一题
+            </a-button>
+            <a-button type="primary" @click="nextTest">
+              下一题
+            </a-button>
+          </div>
         </div>
       </div>
     </div>
@@ -106,8 +114,20 @@ export default {
     const ecId = route.query.id;
     const unit_code = route.query.unit_code;
     const activeSelect = ref("");
+    const activeIndex = ref(0);
     const questionInfo: QuestionInfoType = reactive({
-      questionList: []
+      questionList: [
+        {
+          ep_id: 0,
+          uestion_group: 0,
+          question_id: 0,
+          question_options: "",
+          question_score: 0,
+          question_style: 0,
+          question_title: "",
+          unit_code: ""
+        }
+      ]
     });
     const radioStyle = reactive({
       display: "block",
@@ -123,7 +143,9 @@ export default {
       ep_groups: [],
       ep_id: 0
     });
-
+    const rightList = reactive({
+      jsonArr: []
+    });
     tips.arr = [
       {
         id: 1,
@@ -141,23 +163,24 @@ export default {
         color: "white"
       }
     ];
-    const jsonArr = JSON.parse(
-      '[{"option":"A","label":"选项A：阿基米德"},{"option":"B","label":"选项B：普罗米修斯"},{"option":"C","label":"选项C：牛顿"},{"option":"D","label":"选项D：福尔摩斯"}]'
-    );
-    console.log(jsonArr);
-    const activeIndex = ref(0);
+
     //每道题的问题
-    const selectQuestion = (no: string) => {
-      activeSelect.value = no;
+    const selectQuestion = (no: string, q_id: number) => {
+      activeSelect.value = no; // 01 string
+      activeIndex.value = Number(no); //1 number
       const data = {
         ecId: ecId,
-        no,
+        question_id: q_id,
         unit_code
       };
       getCurrentQuestion(data).then((res: any) => {
         console.log(res);
         const resData: [] = res.data;
         questionInfo.questionList = resData;
+        rightList.jsonArr = JSON.parse(
+          questionInfo.questionList[0].question_options
+        );
+        console.log(rightList.jsonArr, "rightList.jsonArr");
       });
     };
     //获取左边问题栏问题
@@ -169,7 +192,10 @@ export default {
       getLeftMenuList(data).then((res: any) => {
         const resData = res.data;
         Object.assign(testList, resData);
-        selectQuestion(testList.ep_groups[0].group_questions[0].no);
+        selectQuestion(
+          testList.ep_groups[0].group_questions[0].no,
+          testList.ep_groups[0].group_questions[0].question_id
+        );
       });
     };
     fetchLeftMenu();
@@ -191,6 +217,12 @@ export default {
 
     const nextTest = () => {
       console.log(radioValue);
+      activeIndex.value++;
+      if (activeIndex.value > 9) {
+        activeSelect.value = activeIndex.value.toString();
+      } else {
+        activeSelect.value = `0${activeIndex.value}`;
+      }
       const data = {
         question_id: questionInfo.questionList[0].question_id,
         answer: radioValue.value,
@@ -211,7 +243,7 @@ export default {
       plainOptions, //多选菜单
       ...toRefs(checkInfo), //多选
       ...toRefs(questionInfo), //试题信息
-      jsonArr,
+      ...toRefs(rightList),
       // methods
       onChange,
       onCheck,
@@ -224,12 +256,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.content {
+  border: 1px solid #ccc;
+  height: 700px;
+}
 .left {
   float: left;
-  margin-top: 30px;
+  padding-top: 30px;
   width: 230px;
-  height: 600px;
-  border: 1px solid #000;
+  height: 100%;
+  border-right: 1px solid #ccc;
   @media screen and (max-width: 550px) {
     display: none;
   }
@@ -260,6 +296,7 @@ export default {
   .test-list {
     p {
       margin: 2px 0;
+      padding-left: 10px;
     }
     .list {
       justify-content: space-around;
@@ -292,9 +329,8 @@ export default {
 .right {
   float: left;
   width: 60%;
-  margin-top: 30px;
-  margin-left: 20px;
-  height: 600px;
+  padding-left: 20px;
+  height: 100%;
   @media screen and (max-width: 550px) {
     width: 100%;
   }

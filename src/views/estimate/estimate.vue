@@ -129,7 +129,8 @@ interface SubjectTestsInfoType {
 export default {
   setup() {
     const activeIndex = ref();
-    const ecId = ref(); //科目id
+    const ecId = ref(); //试卷分类id
+    const epId = ref(); //试卷id
     const subjectTestsInfo: SubjectTestsInfoType = reactive({
       subjectTestsList: []
     });
@@ -154,6 +155,7 @@ export default {
       subjectTestsInfo.subjectTestsList = [];
       getSelectClass(ecId.value).then((res: any) => {
         subjectTestsInfo.subjectTestsList = res.data;
+        epId.value = res.data[0].ep_id;
         const units = res.data[0].unit;
         const records = res.data[0].ep_record || [];
         const unit_list = [];
@@ -216,8 +218,8 @@ export default {
         router.push({
           path: "/userTest",
           query: {
-            id: ecId.value,
-            unit_code: idx ? `unit_${idx + 1}` : ""
+            id: epId.value,
+            unit_code: idx ? `unit_${idx}` : ""
           }
         });
       } else {

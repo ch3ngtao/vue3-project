@@ -3,7 +3,8 @@ import _axios from '../utils/axios';
 interface CurrentQuestionType {
   ecId: any,
   no?: string,
-  unit_code?: any
+  unit_code?: any,
+  question_id?: number
 }
 
 interface SubmitQuestionType {
@@ -40,7 +41,7 @@ export function getLeftMenuList (data: CurrentQuestionType) {
     method: "post",
     url: '/v1/auth/examine/sideBar',
     data: {
-      ec_id: data.ecId,
+      ep_id: data.ecId,
       unit_code: data.unit_code
     }
   })
@@ -51,8 +52,8 @@ export function getCurrentQuestion (data: CurrentQuestionType) {
     method: "get",
     url: '/v1/auth/examine/questionList',
     params: {
-      ec_id: data.ecId,
-      question_id: data.no,
+      ep_id: data.ecId,
+      question_id: data.question_id,
       unit_code: data.unit_code
     }
   })
