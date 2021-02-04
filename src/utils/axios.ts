@@ -3,6 +3,7 @@ import axios from "axios";
 import qs from 'qs';
 import { Md5 } from "ts-md5";
 import store from "../store";
+import { removeStorage } from './storage';
 
 const _secret = "x5k9cxOGY6y92UR9HhkocqyuDzWQsRg&HBJX9gpDhbRGwEaUJjEQ2yoiysdpQP"
 
@@ -46,6 +47,12 @@ _axios.interceptors.request.use(
 
 _axios.interceptors.response.use(
   function(response): any {
+    const status = response.data.data.code
+    if(status == 4001 || status == 4021 || status == 4031 || status == 4011) {
+      // store.commit("setToken", "null")
+      window.confirm("登录过期，请重新登录")
+      removeStorage("token")
+    }
     return response.data
   }
 )

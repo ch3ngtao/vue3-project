@@ -84,6 +84,9 @@
           开始考试
         </div>
       </div>
+      <div class="content" v-if="subjectTestsList.length == 0">
+        暂无考试信息，敬请期待！
+      </div>
     </div>
     <foot-com />
   </div>

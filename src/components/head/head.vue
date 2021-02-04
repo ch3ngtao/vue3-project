@@ -114,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { inject, reactive, ref, toRefs, watch, watchEffect } from "vue";
+import { inject, reactive, ref, toRefs, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   userRegister,
