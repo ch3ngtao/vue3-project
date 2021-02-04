@@ -50,7 +50,7 @@
             请在规定时间内随时参加考试，自行预留答题时间，超过开放时间则自动交卷。
           </div>
         </div>
-        <div class="test-info">
+        <div class="test-info" v-if="subjectTestsList[0].unit > 0">
           <p>考试单元</p>
           <div class="units">
             <div
@@ -89,6 +89,7 @@
       </div>
     </div>
     <foot-com />
+    <radius-upright-outlined />
   </div>
 </template>
 
@@ -97,7 +98,8 @@ import { reactive, toRefs, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { getTestClass, getSelectClass } from "@/service/test";
 import { useStore } from "vuex";
-import { message } from "ant-design-vue";
+import { notification } from "ant-design-vue";
+import { RadiusUprightOutlined } from "@ant-design/icons-vue";
 interface Sbujiect {
   ec_name: string;
   ec_id: number;
@@ -130,6 +132,9 @@ interface SubjectTestsInfoType {
 }
 
 export default {
+  components: {
+    RadiusUprightOutlined
+  },
   setup() {
     const activeIndex = ref();
     const ecId = ref(); //试卷分类id
@@ -216,7 +221,7 @@ export default {
     };
     fetchClass();
 
-    const toTestPage = (idx: number) => {
+    const toTestPage = (idx: number, type = "topRight") => {
       if (store.state.token) {
         router.push({
           path: "/userTest",
@@ -226,7 +231,12 @@ export default {
           }
         });
       } else {
-        message.info("请登录");
+        // message.info("请登录");
+        notification.open({
+          message: `您还未登录哦`,
+          description: "登录后，解锁考试哦",
+          type
+        });
       }
     };
     return {

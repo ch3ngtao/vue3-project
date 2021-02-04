@@ -10,7 +10,9 @@
 import _axios from "./utils/axios";
 import { useStore } from "vuex";
 import { GetUserInfo } from "./service/user";
-import { provide, ref } from "vue";
+import { provide, ref, createVNode } from "vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { Modal } from "ant-design-vue";
 export default {
   setup() {
     const store = useStore();
@@ -41,6 +43,17 @@ export default {
         })
         .catch(err => {
           console.log(err);
+          store.commit("setDisable", 1);
+          Modal.info({
+            title: "维护中",
+            icon: createVNode(ExclamationCircleOutlined),
+            content: "哦豁，站点正在维护中...",
+            okText: "我知道了",
+            okButtonProps: {
+              disabled: true,
+              type: "danger"
+            }
+          });
         });
     };
     const fetchUserInfo = () => {

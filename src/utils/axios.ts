@@ -61,9 +61,9 @@ _axios.interceptors.response.use(
       if(store.state.isDisable === 0) {
         store.commit("setDisable", 1)
         Modal.info({
-          title: '网站维护中',
+          title: '维护中',
           icon: createVNode(ExclamationCircleOutlined),
-          content: '本网站正在进行维护升级，请稍后进入',
+          content: '哦豁，站点正在维护中...',
           okText: '我知道了',
           okButtonProps: {
             disabled: true,

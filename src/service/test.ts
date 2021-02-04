@@ -11,7 +11,8 @@ interface SubmitQuestionType {
   question_id: string|number,
   answer: string,
   ep_id: string|number,
-  unit_code?:string
+  unit_code?:string,
+  record_id?: number
 }
 
 //试卷分类列表
@@ -67,18 +68,20 @@ export function submitQuestion (data: SubmitQuestionType) {
       question_id: data.question_id,
       answer: data.answer,
       ep_id: data.ep_id,
-      unit_code: data.unit_code
+      unit_code: data.unit_code,
+      ep_record_id: data.record_id
     }
   })
 }
 
 //提交试卷
-export function submitTestCard (id:number|string) {
+export function submitTestCard (id:number|string, ep_record_id: number) {
   return _axios({
     method: "post",
     url: '/v1/auth/examine/finish',
     data: {
-      ep_id: id
+      ep_id: id,
+      ep_record_id
     }
   })
 }

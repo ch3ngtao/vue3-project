@@ -86,10 +86,27 @@
               下一题
             </a-button>
           </div>
+          <div class="btn">
+            <a-button type="primary" @click="subQuestion">
+              提交答案
+            </a-button>
+          </div>
         </div>
       </div>
     </div>
     <foot-com />
+
+    <a-modal
+      title="考试结束"
+      v-model:visible="showScoreModal"
+      :closable="false"
+      cancelText="取消"
+      okText="确定"
+      @ok="handleOk"
+      @cancel="() => (showScoreModal.value = false)"
+    >
+      <p>考试得分: {{ memeberScore }}分</p>
+    </a-modal>
   </div>
 </template>
 
@@ -97,7 +114,7 @@
 import bread from "@/components/bread/bread.vue";
 import { reactive, toRefs, ref, watch } from "vue";
 import { TipsType, EpGroup, QuestionInfoType } from "./userTest";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   getLeftMenuList,
   getCurrentQuestion,
@@ -116,13 +133,17 @@ export default {
     });
     const plainOptions = ["Apple", "Pear", "Orange"];
     const route = useRoute();
+    const router = useRouter();
     const ecId = route.query.id;
-    const qusetion_id = ref(0);
-    const unit_code = route.query.unit_code;
+    const qusetion_id = ref(0); //试卷题目id
+    const unit_code = route.query.unit_code; //单元
     const activeSelect = ref("");
     const activeIndex = ref(0);
     const countTime = ref(0);
     const countTimeStr = ref("");
+    const question_type = ref(); //1单选 2 多选
+    const showScoreModal = ref(false);
+    const memeberScore = ref();
     const questionInfo: QuestionInfoType = reactive({
       questionList: [
         {
@@ -142,14 +163,15 @@ export default {
       height: "30px",
       lineHeight: "30px"
     });
-    const radioValue = ref("A"); //单选
+    const radioValue = ref(); //单选
     const checkInfo = reactive({
       //多选
-      checkList: ["A", "D"]
+      checkList: []
     });
     //左测试题目列表
     const testList: EpGroup = reactive({
       ep_groups: [],
+      ep_record_id: 0,
       ep_id: 0
     });
     const rightList = reactive({
@@ -172,7 +194,6 @@ export default {
         color: "white"
       }
     ];
-
     //选项改变 重新请求右侧数据
     watch(activeSelect, newVal => {
       console.log(newVal);
@@ -204,6 +225,7 @@ export default {
           checkInfo.checkList =
             userRecord && userRecord.member_answers.split("");
         }
+        question_type.value = type;
         console.log(rightList.jsonArr, "rightList.jsonArr");
       });
     });
@@ -249,8 +271,10 @@ export default {
     };
     //提交试卷
     const submitTest = () => {
-      submitTestCard(testList.ep_id).then((res: any) => {
-        console.log(res);
+      submitTestCard(testList.ep_id, testList.ep_record_id).then((res: any) => {
+        console.log(res.data);
+        memeberScore.value = res.data;
+        showScoreModal.value = false;
       });
     };
 
@@ -258,26 +282,49 @@ export default {
       // console.log(checkInfo.checkList);
       console.log(checkInfo.checkList.sort());
     };
-
+    //下一题
     const nextTest = () => {
-      console.log(radioValue);
-      activeIndex.value++;
-      if (activeIndex.value > 9) {
-        activeSelect.value = activeIndex.value.toString();
-      } else {
-        activeSelect.value = `0${activeIndex.value}`;
-      }
       const data = {
         question_id: questionInfo.questionList[0].question_id,
-        answer: radioValue.value,
+        answer:
+          question_type.value == 1
+            ? radioValue.value
+            : checkInfo.checkList.sort().join(","),
         ep_id: questionInfo.questionList[0].ep_id,
+        ep_record_id: testList.ep_record_id,
         unit_code: questionInfo.questionList[0].unit_code
       };
       submitQuestion(data).then((res: any) => {
-        console.log(res);
+        activeIndex.value++;
+        if (activeIndex.value > 9) {
+          activeSelect.value = activeIndex.value.toString();
+        } else {
+          activeSelect.value = `0${activeIndex.value}`;
+        }
       });
     };
-
+    //pc提交答案
+    const subQuestion = () => {
+      const data = {
+        question_id: questionInfo.questionList[0].question_id,
+        answer:
+          question_type.value == 1
+            ? radioValue.value
+            : checkInfo.checkList.sort().join(","),
+        ep_id: questionInfo.questionList[0].ep_id,
+        ep_record_id: testList.ep_record_id,
+        unit_code: questionInfo.questionList[0].unit_code
+      };
+      submitQuestion(data).then((res: any) => {
+        activeIndex.value++;
+        if (activeIndex.value > 9) {
+          activeSelect.value = activeIndex.value.toString();
+        } else {
+          activeSelect.value = `0${activeIndex.value}`;
+        }
+      });
+    };
+    //上一题
     const preTest = () => {
       activeIndex.value--;
       if (activeIndex.value > 9) {
@@ -285,6 +332,11 @@ export default {
       } else {
         activeSelect.value = `0${activeIndex.value}`;
       }
+    };
+
+    const handleOk = () => {
+      showScoreModal.value = false;
+      router.back();
     };
 
     return {
@@ -298,13 +350,17 @@ export default {
       ...toRefs(questionInfo), //试题信息
       ...toRefs(rightList),
       countTimeStr,
+      showScoreModal,
+      memeberScore,
       // methods
       onChange,
       onCheck,
       submitTest,
       nextTest,
       selectQuestion,
-      preTest
+      preTest,
+      subQuestion,
+      handleOk
     };
   }
 };
@@ -413,12 +469,24 @@ export default {
   .btns {
     padding-right: 20px;
     text-align: center;
+    @media screen and (min-width: 550px) {
+      display: none;
+    }
     button {
       margin: 0 15px;
       color: #fff;
       &:first-child {
         background: #e85454;
       }
+    }
+  }
+  .btn {
+    margin-top: 20px;
+    padding-right: 60px;
+    text-align: center;
+    button {
+      margin: 0 15px;
+      color: #fff;
     }
   }
 }

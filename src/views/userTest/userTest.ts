@@ -22,6 +22,7 @@ export interface EpGroupItem {
 export interface EpGroup {
   ep_groups: EpGroupItem[]
   ep_id: number,
+  ep_record_id: number,
   ep_duration?: number
 }
 
