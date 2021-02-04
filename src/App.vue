@@ -33,11 +33,15 @@ export default {
       _axios({
         method: "get",
         url: "/v1/config"
-      }).then((res: any) => {
-        footInfo.value = res.data.site_ba;
-        shouldSms.value = res.data.sms_captcha;
-        document.title = res.data.site_name;
-      });
+      })
+        .then((res: any) => {
+          footInfo.value = res.data.site_ba;
+          shouldSms.value = res.data.sms_captcha;
+          document.title = res.data.site_name;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     };
     const fetchUserInfo = () => {
       GetUserInfo().then((res: any) => {

@@ -5,6 +5,7 @@ export default createStore({
   state: {
     token: getStorage('token') || "",
     userInfo: {},
+    isDisable: 0, //是否展示维护
     visitOrigin: '' //设备类，pc电脑/mobile手机
   },
   mutations: {
@@ -17,6 +18,9 @@ export default createStore({
     },
     setUserInfo: (state, info) => {
       state.userInfo = info
+    },
+    setDisable: (state, data) => {
+      state.isDisable = data
     }
   },
   actions: {
@@ -32,6 +36,10 @@ export default createStore({
 
     setUserInfo({ commit }, info) {
       commit("setUserInfo", info)
+    },
+
+    setDisable({commit}, data) {
+      commit("setDisable", data)
     }
   },
   modules: {}

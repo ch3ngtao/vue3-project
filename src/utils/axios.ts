@@ -1,7 +1,10 @@
 // import Configs from '@/config/config';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { Modal } from 'ant-design-vue';
 import axios from "axios";
 import qs from 'qs';
 import { Md5 } from "ts-md5";
+import { createVNode } from 'vue';
 import store from "../store";
 import { removeStorage } from './storage';
 
@@ -52,6 +55,26 @@ _axios.interceptors.response.use(
       // store.commit("setToken", "null")
       window.confirm("登录过期，请重新登录")
       removeStorage("token")
+    } else if(status == 9){
+      console.log(store.state.isDisable,'isDisable' );
+      
+      if(store.state.isDisable === 0) {
+        store.commit("setDisable", 1)
+        Modal.info({
+          title: '网站维护中',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '本网站正在进行维护升级，请稍后进入',
+          okText: '我知道了',
+          okButtonProps: {
+            disabled: true,
+            type: "danger"
+          }
+        });
+      } else if(store.state.isDisable ===1) {
+        return false
+      }
+    } else {
+      store.commit("setDisable", 0)
     }
     return response.data
   }
