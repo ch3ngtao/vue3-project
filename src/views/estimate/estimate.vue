@@ -152,7 +152,18 @@ export default {
 
     const showTest = computed(() => {
       const { subjectTestsList } = subjectTestsInfo;
-      return !subjectTestsList[0].unit && !subjectTestsList[0].ep_record;
+      const recordInfo: any = subjectTestsList[0].ep_record;
+      // console.log(subjectTestsList[0].ep_record);
+
+      if (!subjectTestsList[0].unit) {
+        if (!recordInfo) {
+          return true;
+        } else if (recordInfo[0].committed == 0) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     });
 
     //选择科目

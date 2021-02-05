@@ -198,6 +198,7 @@ export default {
     //选项改变 重新请求右侧数据
     watch(activeSelect, newVal => {
       console.log(newVal);
+
       let hasMore = false; //判断最后是否到达最后一题
       testList.ep_groups.forEach(item1 => {
         item1.group_questions.forEach(item2 => {
@@ -289,16 +290,18 @@ export default {
     //下一题
     const nextTest = () => {
       let hasMore = false; //判断最后是否到达最后一题
-      activeIndex.value++;
-
+      let index = activeIndex.value;
+      index++;
+      const indexStr = index > 9 ? index.toString() : `0${index}`;
       testList.ep_groups.forEach(item1 => {
         item1.group_questions.forEach(item2 => {
-          if (item2.no === activeSelect.value) {
+          if (item2.no === indexStr) {
             hasMore = true;
           }
         });
       });
       if (hasMore) {
+        activeIndex.value++;
         if (activeIndex.value > 9) {
           activeSelect.value = activeIndex.value.toString();
         } else {
