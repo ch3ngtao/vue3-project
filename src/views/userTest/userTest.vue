@@ -42,7 +42,7 @@
             {{ countTimeStr }}
           </div>
           <div class="question-title" v-if="questionList.length">
-            <span>02</span>
+            <span>{{ activeSelect }}</span>
             <span>{{ questionList[0].question_title }}</span>
           </div>
           <!-- 单选 -->
@@ -289,6 +289,8 @@ export default {
     //下一题
     const nextTest = () => {
       let hasMore = false; //判断最后是否到达最后一题
+      activeIndex.value++;
+
       testList.ep_groups.forEach(item1 => {
         item1.group_questions.forEach(item2 => {
           if (item2.no === activeSelect.value) {
@@ -297,7 +299,6 @@ export default {
         });
       });
       if (hasMore) {
-        activeIndex.value++;
         if (activeIndex.value > 9) {
           activeSelect.value = activeIndex.value.toString();
         } else {
@@ -325,6 +326,7 @@ export default {
         if (res.code == 0) {
           return;
         }
+        message.success("提交成功");
         //左侧答题状态
         testList.ep_groups.forEach(item1 => {
           item1.group_questions.forEach(item2 => {
@@ -337,15 +339,9 @@ export default {
     };
     //上一题
     const preTest = () => {
-      let hasMore = false; //判断最后是否到达最后一题
-      testList.ep_groups.forEach(item1 => {
-        item1.group_questions.forEach(item2 => {
-          if (item2.no === activeSelect.value) {
-            hasMore = true;
-          }
-        });
-      });
-      if (hasMore) {
+      if (activeSelect.value === "01") {
+        return;
+      } else {
         activeIndex.value--;
         if (activeIndex.value > 9) {
           activeSelect.value = activeIndex.value.toString();
