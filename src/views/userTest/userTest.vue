@@ -85,12 +85,13 @@
             <a-button type="primary" @click="nextTest">
               下一题
             </a-button>
-          </div>
-          <div class="btn">
             <a-button type="primary" @click="subQuestion">
               提交答案
             </a-button>
           </div>
+          <!-- <div class="btn">
+            
+          </div> -->
         </div>
       </div>
     </div>
@@ -121,7 +122,7 @@ import {
   submitQuestion,
   submitTestCard
 } from "@/service/test";
-
+import { message } from "ant-design-vue";
 export default {
   components: {
     bread
@@ -287,24 +288,22 @@ export default {
     };
     //下一题
     const nextTest = () => {
-      const data = {
-        question_id: questionInfo.questionList[0].question_id,
-        answer:
-          question_type.value == 1
-            ? radioValue.value
-            : checkInfo.checkList.sort().join(","),
-        ep_id: questionInfo.questionList[0].ep_id,
-        ep_record_id: testList.ep_record_id,
-        unit_code: questionInfo.questionList[0].unit_code
-      };
-      submitQuestion(data).then((res: any) => {
+      let hasMore = false; //判断最后是否到达最后一题
+      testList.ep_groups.forEach(item1 => {
+        item1.group_questions.forEach(item2 => {
+          if (item2.no === activeSelect.value) {
+            hasMore = true;
+          }
+        });
+      });
+      if (hasMore) {
         activeIndex.value++;
         if (activeIndex.value > 9) {
           activeSelect.value = activeIndex.value.toString();
         } else {
           activeSelect.value = `0${activeIndex.value}`;
         }
-      });
+      }
     };
     //pc提交答案
     const subQuestion = () => {
@@ -318,7 +317,15 @@ export default {
         ep_record_id: testList.ep_record_id,
         unit_code: questionInfo.questionList[0].unit_code
       };
+      if (!data.answer) {
+        message.warning("请选择答案", 10);
+        return;
+      }
       submitQuestion(data).then((res: any) => {
+        if (res.code == 0) {
+          return;
+        }
+        //左侧答题状态
         testList.ep_groups.forEach(item1 => {
           item1.group_questions.forEach(item2 => {
             if (item2.no === activeSelect.value) {
@@ -326,21 +333,25 @@ export default {
             }
           });
         });
-        activeIndex.value++;
+      });
+    };
+    //上一题
+    const preTest = () => {
+      let hasMore = false; //判断最后是否到达最后一题
+      testList.ep_groups.forEach(item1 => {
+        item1.group_questions.forEach(item2 => {
+          if (item2.no === activeSelect.value) {
+            hasMore = true;
+          }
+        });
+      });
+      if (hasMore) {
+        activeIndex.value--;
         if (activeIndex.value > 9) {
           activeSelect.value = activeIndex.value.toString();
         } else {
           activeSelect.value = `0${activeIndex.value}`;
         }
-      });
-    };
-    //上一题
-    const preTest = () => {
-      activeIndex.value--;
-      if (activeIndex.value > 9) {
-        activeSelect.value = activeIndex.value.toString();
-      } else {
-        activeSelect.value = `0${activeIndex.value}`;
       }
     };
 
@@ -479,9 +490,10 @@ export default {
   .btns {
     padding-right: 20px;
     text-align: center;
-    @media screen and (min-width: 550px) {
-      display: none;
-    }
+    // @media screen and (min-width: 550px) {
+    //   display: none;
+    // }
+    margin-top: 20px;
     button {
       margin: 0 15px;
       color: #fff;

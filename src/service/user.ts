@@ -2,7 +2,7 @@ import { Md5 } from "ts-md5";
 import _axios from '../utils/axios';
 
 interface UserInfoType {
-  key: number | null;
+  key: string;
   password: number | string;
   image_code: string;
   checkpassword: number | string;
@@ -50,7 +50,7 @@ export function userLogin (userInfo:UserInfoType, uuid:string) {
 }
 
 //发送验证码
-export function getCode (uuid:string,phone:number|null,id?:number|string) {
+export function getCode (uuid:string,phone:string,id?:number|string) {
   return _axios({
     method: "post",
     url: "/v1/captcha/sms",

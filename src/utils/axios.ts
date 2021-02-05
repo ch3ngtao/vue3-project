@@ -76,6 +76,11 @@ _axios.interceptors.response.use(
       } else if(store.state.isDisable ===1) {
         return false
       }
+    } else if(status == 0) {
+      store.commit("setDisable", 0)
+      notification.open({
+        description: response.data.message
+      });
     } else {
       store.commit("setDisable", 0)
     }

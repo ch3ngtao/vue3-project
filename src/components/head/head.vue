@@ -94,7 +94,7 @@
         />
       </div>
       <div class="password">
-        <span class="span">图形验证</span>
+        <span class="span">验证码</span>
         <a-input
           v-model:value="image_code"
           placeholder="请输入"
@@ -103,7 +103,7 @@
         <img :src="imgCode" @click="getImageCode" class="image" />
       </div>
       <div class="password" v-if="shouldSms === 'open'">
-        <span class="span">验证码</span>
+        <span class="span">短信验证</span>
         <a-input
           v-model:value="code"
           placeholder="请输入验证码"
@@ -118,6 +118,8 @@
 <script lang="ts">
 import { inject, reactive, ref, toRefs, watch } from "vue";
 import { useRouter } from "vue-router";
+import { notification } from "ant-design-vue";
+import { isPhone } from "@/utils/util";
 import {
   userRegister,
   userLogin,
@@ -126,7 +128,7 @@ import {
   GetUserInfo
 } from "@/service/user";
 interface UserInfoType {
-  key: number | null;
+  key: string;
   password: number | string;
   image_code: string;
   checkpassword: number | string;
@@ -140,7 +142,7 @@ export default {
     const loginModal = ref(false);
     const shouldSms = inject("sms");
     const userInfo: UserInfoType = reactive({
-      key: null, //手机号
+      key: "", //手机号
       password: "", //第一次密码
       checkpassword: "", //第二次密码
       code: "", //sms短信验证
@@ -172,7 +174,7 @@ export default {
     };
 
     const resetUserInfo = () => {
-      userInfo.key = null;
+      userInfo.key = "";
       userInfo.password = ""; //第一次密码
       userInfo.checkpassword = ""; //第二次密码
       userInfo.code = ""; //sms短信验证
@@ -183,11 +185,16 @@ export default {
 
     //短信验证码
     const sendCode = () => {
+      if (!isPhone(userInfo.key)) {
+        message.warning("请输入正确手机号");
+        return;
+      }
       if (shouldRequest) {
         shouldRequest = false;
         durtime.value = 60;
         coutTime();
         getCode(uuid, userInfo.key, userInfo.image_code).then((res: any) => {
+          message.success("发送成功");
           console.log(res);
         });
       }
@@ -213,37 +220,47 @@ export default {
           getImageCode();
         }
       });
-      // userInfo = {
-      //   key: null, //手机号
-      //   password: "", //第一次密码
-      //   checkpassword: "", //第二次密码
-      //   code: "", //sms短信验证
-      //   image_code: "" //图形验证码
-      // };
     });
     //登录
     const loginIn = () => {
+      if (!isPhone(userInfo.key)) {
+        message.warning("请输入正确手机号");
+        console.log(userInfo.key?.toString.length);
+        return;
+      }
       userLogin(userInfo, uuid).then((res: any) => {
         console.log(res);
-        if (res.data && res.data.token) {
+        if (res.code === 2000) {
           loginModal.value = false;
           store.commit("setToken", res.data.token);
+          message.success("登陆成功");
           upDateUserInfo();
           resetUserInfo();
         } else {
-          message.info("密码错误");
+          message.warning("密码错误");
         }
       });
     };
     //注册
     const register = () => {
-      userRegister(userInfo, uuid).then((res: any) => {
-        console.log(res);
-        if (res.message === "success") {
-          registerModal.value = false;
-          resetUserInfo();
-        }
-      });
+      if (userInfo.password !== userInfo.checkpassword) {
+        notification.open({
+          message: "信息错误",
+          description: "您两次输入的密码不一致"
+        });
+      } else if (!isPhone(userInfo.key)) {
+        message.warning("请输入正确手机号");
+        return;
+      } else {
+        userRegister(userInfo, uuid).then((res: any) => {
+          console.log(res);
+          if (res.code === 2000) {
+            registerModal.value = false;
+            resetUserInfo();
+            message.success("注册成功，请登录");
+          }
+        });
+      }
     };
     //跳转个人中心
     const toUserCenter = () => {

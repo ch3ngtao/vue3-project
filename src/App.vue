@@ -62,7 +62,10 @@ export default {
         store.commit("setUserInfo", res.data);
       });
     };
-    fetchUserInfo();
+    if (store.state.token) {
+      fetchUserInfo();
+    }
+
     initConfig();
   }
 };

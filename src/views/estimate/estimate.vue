@@ -77,21 +77,11 @@
               subjectTestsList[0].ep_record[0].member_score
           }}
         </div>
-        <div
-          class="btn-test"
-          v-if="
-            !subjectTestsList[0].unit &&
-              subjectTestsList[0].ep_record &&
-              subjectTestsList[0].ep_record[0].committed == 0
-          "
-          @click="toTestPage(null)"
-        >
+        <div class="btn-test" v-if="showTest" @click="toTestPage(null)">
           开始考试
         </div>
       </div>
-      <div class="content" v-if="subjectTestsList.length == 0">
-        暂无考试信息，敬请期待！
-      </div>
+      <div class="content" v-if="subjectTestsList.length == 0"></div>
     </div>
     <!-- <radius-upright-outlined /> -->
     <foot-com />
@@ -160,6 +150,11 @@ export default {
       unitLists: [{}]
     });
 
+    const showTest = computed(() => {
+      const { subjectTestsList } = subjectTestsInfo;
+      return !subjectTestsList[0].unit && !subjectTestsList[0].ep_record;
+    });
+
     //选择科目
     const selectSubject = (i: number, ec_id: number) => {
       activeIndex.value = i;
@@ -223,7 +218,7 @@ export default {
     fetchClass();
 
     const toTestPage = (e: any, type = "topRight") => {
-      if (e.committed == 1) {
+      if (e && e.committed == 1) {
         return;
       }
       if (store.state.token) {
@@ -256,7 +251,8 @@ export default {
       fetchClass,
       selectSubject,
       startTime,
-      endTime
+      endTime,
+      showTest
     };
   }
 };
