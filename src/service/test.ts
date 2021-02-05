@@ -12,7 +12,7 @@ interface SubmitQuestionType {
   answer: string,
   ep_id: string|number,
   unit_code?:string,
-  record_id?: number
+  ep_record_id?: number
 }
 
 //试卷分类列表
@@ -66,10 +66,10 @@ export function submitQuestion (data: SubmitQuestionType) {
     url: '/v1/auth/question/answer',
     data: {
       question_id: data.question_id,
-      answer: data.answer,
+      answers: data.answer,
       ep_id: data.ep_id,
       unit_code: data.unit_code,
-      ep_record_id: data.record_id
+      ep_record_id: data.ep_record_id
     }
   })
 }

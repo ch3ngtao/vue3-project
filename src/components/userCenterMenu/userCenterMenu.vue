@@ -9,13 +9,13 @@
       </div>
       <div>
         <a-menu style="width: 100%" mode="vertical" @click="handleClick">
-          <a-menu-item key="1" :disabled="true">
+          <!-- <a-menu-item key="1" :disabled="true">
             个人中心
-          </a-menu-item>
+          </a-menu-item> -->
           <a-menu-item key="2">
             修改密码
           </a-menu-item>
-          <a-menu-item key="3">
+          <a-menu-item key="3" @click="quitLogin">
             退出登录
           </a-menu-item>
         </a-menu>
@@ -28,10 +28,13 @@
 <script lang="ts">
 import { ref, toRefs } from "vue";
 import { useStore } from "vuex";
+import { removeStorage } from "@/utils/storage";
+import { useRouter } from "vue-router";
 export default {
   setup() {
     const showSlide = ref(0);
     const store = useStore();
+    const router = useRouter();
 
     const handleClick = (e: Record<string, any>) => {
       console.log(e);
@@ -52,10 +55,21 @@ export default {
       }
     };
 
+    const quitLogin = () => {
+      removeStorage("token");
+      store.commit("setToken", "");
+      setTimeout(() => {
+        router.push({
+          path: "/estimate"
+        });
+      }, 50);
+    };
+
     return {
       handleClick,
       slideMenu,
-      ...toRefs(store.state)
+      ...toRefs(store.state),
+      quitLogin
     };
   }
 };

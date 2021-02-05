@@ -197,10 +197,12 @@ export default {
     //选项改变 重新请求右侧数据
     watch(activeSelect, newVal => {
       console.log(newVal);
+      let hasMore = false; //判断最后是否到达最后一题
       testList.ep_groups.forEach(item1 => {
         item1.group_questions.forEach(item2 => {
           if (item2.no === newVal) {
             qusetion_id.value = item2.question_id;
+            hasMore = true;
           }
         });
       });
@@ -209,25 +211,26 @@ export default {
         question_id: qusetion_id.value,
         unit_code
       };
-      getCurrentQuestion(data).then((res: any) => {
-        console.log(res);
-        const resData: [] = res.data;
-        const userRecord = res.data[0].q_record;
-        const type = res.data[0].question_style;
-        questionInfo.questionList = resData;
-        //处理试卷问题列表
-        rightList.jsonArr = JSON.parse(
-          questionInfo.questionList[0].question_options
-        );
-        if (type == 1) {
-          radioValue.value = userRecord && userRecord.member_answers;
-        } else {
-          checkInfo.checkList =
-            userRecord && userRecord.member_answers.split("");
-        }
-        question_type.value = type;
-        console.log(rightList.jsonArr, "rightList.jsonArr");
-      });
+      if (hasMore) {
+        getCurrentQuestion(data).then((res: any) => {
+          console.log(res);
+          const resData: [] = res.data;
+          const userRecord = res.data[0].q_record;
+          const type = res.data[0].question_style;
+          questionInfo.questionList = resData;
+          //处理试卷问题列表
+          rightList.jsonArr = JSON.parse(
+            questionInfo.questionList[0].question_options
+          );
+          if (type == 1) {
+            radioValue.value = userRecord && userRecord.member_answers;
+          } else {
+            checkInfo.checkList =
+              userRecord && userRecord.member_answers.split("");
+          }
+          question_type.value = type;
+        });
+      }
     });
 
     //点击左侧原点
@@ -274,7 +277,7 @@ export default {
       submitTestCard(testList.ep_id, testList.ep_record_id).then((res: any) => {
         console.log(res.data);
         memeberScore.value = res.data;
-        showScoreModal.value = false;
+        showScoreModal.value = true;
       });
     };
 
@@ -316,6 +319,13 @@ export default {
         unit_code: questionInfo.questionList[0].unit_code
       };
       submitQuestion(data).then((res: any) => {
+        testList.ep_groups.forEach(item1 => {
+          item1.group_questions.forEach(item2 => {
+            if (item2.no === activeSelect.value) {
+              item2.answered = 1;
+            }
+          });
+        });
         activeIndex.value++;
         if (activeIndex.value > 9) {
           activeSelect.value = activeIndex.value.toString();

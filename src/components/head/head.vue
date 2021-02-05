@@ -27,6 +27,7 @@
       :maskClosable="false"
       :closable="false"
       @ok="loginIn"
+      @cancel="resetUserInfo"
     >
       <div class="user">
         <span class="span">手机号</span>
@@ -66,6 +67,7 @@
       :maskClosable="false"
       :closable="false"
       @ok="register"
+      @cancel="resetUserInfo"
     >
       <div class="user">
         <span class="span">手机号</span>
@@ -169,6 +171,16 @@ export default {
       timer = setTimeout(coutTime, 1e3);
     };
 
+    const resetUserInfo = () => {
+      userInfo.key = null;
+      userInfo.password = ""; //第一次密码
+      userInfo.checkpassword = ""; //第二次密码
+      userInfo.code = ""; //sms短信验证
+      userInfo.image_code = ""; //图形验证码
+
+      console.log(userInfo);
+    };
+
     //短信验证码
     const sendCode = () => {
       if (shouldRequest) {
@@ -217,6 +229,7 @@ export default {
           loginModal.value = false;
           store.commit("setToken", res.data.token);
           upDateUserInfo();
+          resetUserInfo();
         } else {
           message.info("密码错误");
         }
@@ -228,6 +241,7 @@ export default {
         console.log(res);
         if (res.message === "success") {
           registerModal.value = false;
+          resetUserInfo();
         }
       });
     };
@@ -251,7 +265,8 @@ export default {
       register,
       toUserCenter,
       sendCode,
-      getImageCode
+      getImageCode,
+      resetUserInfo
     };
   }
 };

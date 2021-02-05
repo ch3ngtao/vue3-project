@@ -55,11 +55,12 @@
           <div class="units">
             <div
               class="units-item"
-              v-for="(item, index) in subjectTestsList[0].unit"
+              v-for="(item, index) in unitLists"
               :key="item"
               @click="toTestPage(item)"
             >
-              第{{ index + 1 }}单元
+              <span v-if="item.committed != 1">第{{ index + 1 }}单元</span>
+              <span v-else>考试得分:{{ item.member_score }}</span>
             </div>
           </div>
         </div>
@@ -78,7 +79,11 @@
         </div>
         <div
           class="btn-test"
-          v-if="!subjectTestsList[0].unit"
+          v-if="
+            !subjectTestsList[0].unit &&
+              subjectTestsList[0].ep_record &&
+              subjectTestsList[0].ep_record[0].committed == 0
+          "
           @click="toTestPage(null)"
         >
           开始考试
@@ -88,8 +93,8 @@
         暂无考试信息，敬请期待！
       </div>
     </div>
+    <!-- <radius-upright-outlined /> -->
     <foot-com />
-    <radius-upright-outlined />
   </div>
 </template>
 
@@ -99,7 +104,7 @@ import { useRouter } from "vue-router";
 import { getTestClass, getSelectClass } from "@/service/test";
 import { useStore } from "vuex";
 import { notification } from "ant-design-vue";
-import { RadiusUprightOutlined } from "@ant-design/icons-vue";
+// import { RadiusUprightOutlined } from "@ant-design/icons-vue";
 interface Sbujiect {
   ec_name: string;
   ec_id: number;
@@ -133,7 +138,7 @@ interface SubjectTestsInfoType {
 
 export default {
   components: {
-    RadiusUprightOutlined
+    // RadiusUprightOutlined
   },
   setup() {
     const activeIndex = ref();
@@ -186,10 +191,6 @@ export default {
         });
         unitList.unitLists = unit_list;
         console.log(unitList.unitLists, "unitLists");
-        console.log(
-          subjectTestsInfo.subjectTestsList,
-          "subjectTestsInfo.subjectTestsList"
-        );
       });
     };
 
@@ -221,13 +222,16 @@ export default {
     };
     fetchClass();
 
-    const toTestPage = (idx: number, type = "topRight") => {
+    const toTestPage = (e: any, type = "topRight") => {
+      if (e.committed == 1) {
+        return;
+      }
       if (store.state.token) {
         router.push({
           path: "/userTest",
           query: {
             id: epId.value,
-            unit_code: idx ? `unit_${idx}` : ""
+            unit_code: e ? e.unit_code : ""
           }
         });
       } else {
