@@ -1,6 +1,6 @@
 // import Configs from '@/config/config';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import { Modal } from 'ant-design-vue';
+import { Modal, notification } from 'ant-design-vue';
 import axios from "axios";
 import qs from 'qs';
 import { Md5 } from "ts-md5";
@@ -50,10 +50,13 @@ _axios.interceptors.request.use(
 
 _axios.interceptors.response.use(
   function(response): any {
-    const status = response.data.data.code
+    const status = response.data.code
     if(status == 4001 || status == 4021 || status == 4031 || status == 4011) {
-      // store.commit("setToken", "null")
-      window.confirm("登录过期，请重新登录")
+      notification.open({
+        message: '登录超时',
+        description:
+          '您的登录信息已过期，请重新登录',
+      });
       removeStorage("token")
     } else if(status == 9){
       console.log(store.state.isDisable,'isDisable' );

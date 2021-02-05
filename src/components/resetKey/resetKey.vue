@@ -47,6 +47,9 @@ export default {
       re_new: "",
       imageCode: ""
     });
+    const uuid = Math.random()
+      .toString(36)
+      .slice(-8);
 
     const store = useStore();
 
@@ -58,7 +61,7 @@ export default {
         re_password: passwordInfo.re_new,
         image_code: passwordInfo.imageCode
       };
-      changePassWord(data).then((res: any) => {
+      changePassWord(data, uuid).then((res: any) => {
         console.log(res);
         removeStorage("token");
         store.commit("setToken", "");
@@ -66,7 +69,7 @@ export default {
     };
 
     const getImageCode = () => {
-      getImage().then(res => {
+      getImage(uuid).then(res => {
         code_img.value = res.data;
       });
     };

@@ -5,7 +5,7 @@ interface UserInfoType {
   key: number | null;
   password: number | string;
   image_code: string;
-  checkpassword?: number | string;
+  checkpassword: number | string;
   code?: number | string;
 }
 
@@ -15,26 +15,26 @@ interface ChangePassWordType {
   image_code: number|string,
 }
 //用户注册
-export function userRegister (userInfo:UserInfoType) {
+export function userRegister (userInfo:UserInfoType, uuid:string) {
   const { password, key, checkpassword, code, image_code } = userInfo
+  const secret:string = Md5.hashStr(password.toString()).toString().toUpperCase();
+  const secret_re= Md5.hashStr(checkpassword.toString()).toString().toUpperCase();
   return _axios({
     method: 'post',
     url: "/v1/registerBySMS",
     data: {
-      password,
+      password: secret,
       mobile: key,
-      re_password: checkpassword,
-      captcha: code,
+      re_password: secret_re,
+      sms_code: code,
       image_code,
-      uuid: Math.random()
-        .toString(36)
-        .slice(-8)
+      uuid
     }
   })
 }
 
 //用户登录
-export function userLogin (userInfo:UserInfoType) {
+export function userLogin (userInfo:UserInfoType, uuid:string) {
   const { key, password, image_code } = userInfo;
   const secret:string = Md5.hashStr(password.toString()).toString().toUpperCase();
   return _axios({
@@ -43,40 +43,37 @@ export function userLogin (userInfo:UserInfoType) {
     data: {
       password: secret,
       mobile: key,
-      image_code
+      image_code,
+      uuid
     }
   })
 }
 
 //发送验证码
-export function getCode (phone:number|null,id?:number|string) {
+export function getCode (uuid:string,phone:number|null,id?:number|string) {
   return _axios({
     method: "post",
     url: "/v1/captcha/sms",
     data: {
-      uuid: Math.random()
-        .toString(36)
-        .slice(-8),
-      captcha: id,
+      uuid,
+      image_code: id,
       mobile: phone
     }
   })
 }
 //图形验证码
-export function getImage () {
+export function getImage ( uuid:string) {
   return _axios({
     method: "get",
     url: "/v1/captcha/image",
     params: {
-      uuid: Math.random()
-        .toString(36)
-        .slice(-8)
+      uuid
     }
   })
 }
 
 //修改密码
-export function changePassWord (data: ChangePassWordType) {
+export function changePassWord (data: ChangePassWordType, uuid:string) {
   return _axios({
     method: "post",
     url: "/v1/member/add",
@@ -84,9 +81,7 @@ export function changePassWord (data: ChangePassWordType) {
       password: data.password,
       re_password: data.re_password,
       image_code: data.image_code,
-      uuid: Math.random()
-      .toString(36)
-      .slice(-8)
+      uuid
     }
   })
 }

@@ -127,7 +127,7 @@ interface UserInfoType {
   key: number | null;
   password: number | string;
   image_code: string;
-  checkpassword?: number | string;
+  checkpassword: number | string;
   code?: number | string;
 }
 import { useStore } from "vuex";
@@ -137,21 +137,23 @@ export default {
     const registerModal = ref(false);
     const loginModal = ref(false);
     const shouldSms = inject("sms");
-    let userInfo: UserInfoType = reactive({
-      key: null,
-      password: "",
-      checkpassword: "",
-      code: "",
-      image_code: ""
+    const userInfo: UserInfoType = reactive({
+      key: null, //手机号
+      password: "", //第一次密码
+      checkpassword: "", //第二次密码
+      code: "", //sms短信验证
+      image_code: "" //图形验证码
     });
     const imgCode = ref("");
     const router = useRouter();
     const store = useStore();
-    console.log(store.state.token, "token");
     const durtime = ref(0);
     const showDesc = ref("发送验证码");
     let timer: any;
     let shouldRequest = true;
+    const uuid = Math.random()
+      .toString(36)
+      .slice(-8);
     // 倒计时;
     const coutTime = () => {
       if (durtime.value == 0) {
@@ -173,7 +175,7 @@ export default {
         shouldRequest = false;
         durtime.value = 60;
         coutTime();
-        getCode(userInfo.key, userInfo.image_code).then((res: any) => {
+        getCode(uuid, userInfo.key, userInfo.image_code).then((res: any) => {
           console.log(res);
         });
       }
@@ -181,7 +183,7 @@ export default {
 
     //获取图形验证码
     const getImageCode = () => {
-      getImage().then((res: any) => {
+      getImage(uuid).then((res: any) => {
         imgCode.value = res.data;
       });
     };
@@ -199,22 +201,22 @@ export default {
           getImageCode();
         }
       });
+      // userInfo = {
+      //   key: null, //手机号
+      //   password: "", //第一次密码
+      //   checkpassword: "", //第二次密码
+      //   code: "", //sms短信验证
+      //   image_code: "" //图形验证码
+      // };
     });
     //登录
     const loginIn = () => {
-      userLogin(userInfo).then((res: any) => {
+      userLogin(userInfo, uuid).then((res: any) => {
         console.log(res);
         if (res.data && res.data.token) {
           loginModal.value = false;
           store.commit("setToken", res.data.token);
           upDateUserInfo();
-          userInfo = {
-            key: null,
-            password: "",
-            checkpassword: "",
-            code: "",
-            image_code: ""
-          };
         } else {
           message.info("密码错误");
         }
@@ -222,17 +224,10 @@ export default {
     };
     //注册
     const register = () => {
-      userRegister(userInfo).then((res: any) => {
+      userRegister(userInfo, uuid).then((res: any) => {
         console.log(res);
         if (res.message === "success") {
           registerModal.value = false;
-          userInfo = {
-            key: null,
-            password: "",
-            checkpassword: "",
-            code: "",
-            image_code: ""
-          };
         }
       });
     };
@@ -275,7 +270,7 @@ export default {
   .logo {
     float: left;
     width: 100px;
-    height: 110px;
+    height: 100px;
     border-radius: 50%;
     @media screen and (max-width: 550px) {
       width: 50px;
