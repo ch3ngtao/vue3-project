@@ -30,6 +30,9 @@ import { ref, toRefs } from "vue";
 import { useStore } from "vuex";
 import { removeStorage } from "@/utils/storage";
 import { useRouter } from "vue-router";
+import { Modal } from "ant-design-vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { createVNode } from "vue";
 export default {
   setup() {
     const showSlide = ref(0);
@@ -56,13 +59,30 @@ export default {
     };
 
     const quitLogin = () => {
-      removeStorage("token");
-      store.commit("setToken", "");
-      setTimeout(() => {
-        router.push({
-          path: "/estimate"
-        });
-      }, 50);
+      Modal.confirm({
+        title: "退出提示",
+        icon: createVNode(ExclamationCircleOutlined),
+        content: createVNode(
+          "div",
+          { style: "color:black;" },
+          "你确定要退出登录吗？"
+        ),
+        okText: "确定",
+        cancelText: "取消",
+        onOk() {
+          removeStorage("token");
+          store.commit("setToken", "");
+          setTimeout(() => {
+            router.push({
+              path: "/estimate"
+            });
+          }, 50);
+        },
+        onCancel() {
+          console.log("Cancel");
+        },
+        class: "test"
+      });
     };
 
     return {

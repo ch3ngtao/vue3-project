@@ -13,7 +13,9 @@
           注册
         </a-button>
       </div>
-      <div class="user-center" v-else @click="toUserCenter">个人中心</div>
+      <div class="user-center" v-else @click="toUserCenter">
+        {{ headTitle }}
+      </div>
     </div>
 
     <a-modal
@@ -117,7 +119,7 @@
 
 <script lang="ts">
 import { inject, reactive, ref, toRefs, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { notification } from "ant-design-vue";
 import { isPhone } from "@/utils/util";
 import {
@@ -148,6 +150,9 @@ export default {
       code: "", //sms短信验证
       image_code: "" //图形验证码
     });
+    const route = useRoute();
+    console.log(route.meta.title);
+    const headTitle = ref("个人中心");
     const imgCode = ref("");
     const router = useRouter();
     const store = useStore();
@@ -158,6 +163,11 @@ export default {
     const uuid = Math.random()
       .toString(36)
       .slice(-8);
+    if (route.meta.title === "个人中心") {
+      headTitle.value = "首页";
+    } else {
+      headTitle.value = "个人中心";
+    }
     // 倒计时;
     const coutTime = () => {
       if (durtime.value == 0) {
@@ -264,9 +274,15 @@ export default {
     };
     //跳转个人中心
     const toUserCenter = () => {
-      router.push({
-        path: "/userCenter"
-      });
+      if (headTitle.value === "首页") {
+        router.push({
+          path: "/estimate"
+        });
+      } else {
+        router.push({
+          path: "/userCenter"
+        });
+      }
     };
     return {
       loginModal,
@@ -277,6 +293,7 @@ export default {
       showDesc, //发送验证码
       imgCode, //图片验证码地址
       shouldSms, //是否发生短信验证码
+      headTitle,
       // methods
       loginIn,
       register,
